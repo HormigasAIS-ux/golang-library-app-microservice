@@ -21,6 +21,10 @@ type AuthUcase struct {
 }
 
 type IAuthUcase interface {
+	Register(payload dto.RegisterUserReq) (*dto.RegisterUserRespData, error)
+	Login(payload dto.LoginReq) (*dto.LoginRespData, error)
+	RefreshToken(payload dto.RefreshTokenReq) (*dto.RefreshTokenRespData, error)
+	CheckToken(payload dto.CheckTokenReq) (*dto.CheckTokenRespData, error)
 }
 
 func NewAuthUcase(
@@ -33,7 +37,7 @@ func NewAuthUcase(
 	}
 }
 
-func (s *AuthUcase) Register(payload dto.RegisterUserReq) (*dto.RegisterUserResp, error) {
+func (s *AuthUcase) Register(payload dto.RegisterUserReq) (*dto.RegisterUserRespData, error) {
 	// validate input
 	err := validator_util.ValidateUsername(payload.Username)
 	if err != nil {
@@ -125,14 +129,14 @@ func (s *AuthUcase) Register(payload dto.RegisterUserReq) (*dto.RegisterUserResp
 		return nil, err
 	}
 
-	resp := &dto.RegisterUserResp{
+	resp := &dto.RegisterUserRespData{
 		AccessToken:  token,
 		RefreshToken: newRefreshTokenObj.Token,
 	}
 	return resp, nil
 }
 
-func (s *AuthUcase) Login(payload dto.LoginReq) (*dto.LoginResp, error) {
+func (s *AuthUcase) Login(payload dto.LoginReq) (*dto.LoginRespData, error) {
 	// validate username
 	if strings.Contains(payload.UsernameOrEmail, "@") {
 		err := validator_util.ValidateUsername(payload.UsernameOrEmail)
@@ -216,13 +220,13 @@ func (s *AuthUcase) Login(payload dto.LoginReq) (*dto.LoginResp, error) {
 		return nil, err
 	}
 
-	return &dto.LoginResp{
+	return &dto.LoginRespData{
 		AccessToken:  token,
 		RefreshToken: newRefreshTokenObj.Token,
 	}, nil
 }
 
-func (s *AuthUcase) RefreshToken(payload dto.RefreshTokenReq) (*dto.RefreshTokenResp, error) {
+func (s *AuthUcase) RefreshToken(payload dto.RefreshTokenReq) (*dto.RefreshTokenRespData, error) {
 	// get refresh token
 	refreshToken, err := s.refreshTokenRepo.GetByToken(payload.RefreshToken)
 	if err != nil {
@@ -301,13 +305,13 @@ func (s *AuthUcase) RefreshToken(payload dto.RefreshTokenReq) (*dto.RefreshToken
 		return nil, err
 	}
 
-	return &dto.RefreshTokenResp{
+	return &dto.RefreshTokenRespData{
 		AccessToken:  token,
 		RefreshToken: newRefreshTokenObj.Token,
 	}, nil
 }
 
-func (s *AuthUcase) CheckToken(payload dto.CheckTokenReq) (*dto.CheckTokenResp, error) {
+func (s *AuthUcase) CheckToken(payload dto.CheckTokenReq) (*dto.CheckTokenRespData, error) {
 	claims, err := jwt_util.ValidateJWT(payload.AccessToken, config.Envs.JWT_SECRET_KEY)
 	if err != nil {
 		logger.Errorf("error validating token: %v", err)
@@ -323,7 +327,7 @@ func (s *AuthUcase) CheckToken(payload dto.CheckTokenReq) (*dto.CheckTokenResp, 
 	fullname, _ := claims["fullname"].(string)
 	email, _ := claims["email"].(string)
 
-	resp := &dto.CheckTokenResp{
+	resp := &dto.CheckTokenRespData{
 		UUID:     sub,
 		Username: username,
 		Fullname: fullname,

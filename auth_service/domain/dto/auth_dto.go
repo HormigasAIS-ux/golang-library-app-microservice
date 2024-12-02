@@ -14,7 +14,7 @@ type RegisterUserReq struct {
 	Fullname string `json:"fullname" validate:"required"`
 }
 
-type RegisterUserResp struct {
+type RegisterUserRespData struct {
 	AccessToken  string `json:"access_token"`
 	RefreshToken string `json:"refresh_token"`
 }
@@ -24,7 +24,7 @@ type LoginReq struct {
 	Password        string `json:"password" validate:"required"`
 }
 
-type LoginResp struct {
+type LoginRespData struct {
 	AccessToken  string `json:"access_token"`
 	RefreshToken string `json:"refresh_token"`
 }
@@ -33,7 +33,7 @@ type CheckTokenReq struct {
 	AccessToken string `json:"access_token" validate:"required"`
 }
 
-type CheckTokenResp struct {
+type CheckTokenRespData struct {
 	UUID     string `json:"uuid"`
 	Username string `json:"username"`
 	Fullname string `json:"fullname"`
@@ -44,7 +44,7 @@ type RefreshTokenReq struct {
 	RefreshToken string `json:"refresh_token" validate:"required"`
 }
 
-type RefreshTokenResp struct {
+type RefreshTokenRespData struct {
 	AccessToken  string `json:"access_token"`
 	RefreshToken string `json:"refresh_token"`
 }
