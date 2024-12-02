@@ -7,6 +7,7 @@ import (
 type EnvsSchema struct {
 	HOST                  string
 	PORT                  int
+	LOG_LEVEL             string
 	JWT_SECRET_KEY        string
 	JWT_EXP_HOURS         int
 	JWT_REFRESH_EXP_HOURS int
@@ -23,6 +24,7 @@ func envInitiator() {
 	Envs = &EnvsSchema{
 		HOST:                  viper.GetString("HOST"),
 		PORT:                  viper.GetInt("PORT"),
+		LOG_LEVEL:             viper.GetString("LOG_LEVEL"),
 		JWT_SECRET_KEY:        viper.GetString("JWT_SECRET_KEY"),
 		JWT_EXP_HOURS:         viper.GetInt("JWT_EXP_HOURS"),
 		JWT_REFRESH_EXP_HOURS: viper.GetInt("JWT_REFRESH_EXP_HOURS"),
