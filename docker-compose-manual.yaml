@@ -18,7 +18,8 @@ services:
       - .env
 
   syn_auth_service_rest:
-    image: ${AUTH_SERVICE_IMAGE}
+    build:
+      context: ./auth_service
     container_name: syn_auth_service_rest
     command: ["./auth_service", "--server=rest"]
     ports:
