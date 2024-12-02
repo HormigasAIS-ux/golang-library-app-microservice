@@ -26,6 +26,9 @@ func NewUserRepo(db *gorm.DB) IUserRepo {
 
 func (repo *UserRepo) Create(user *model.User) error {
 	err := repo.db.Create(user).Error
+	if err != nil {
+		return errors.New("failed to create user")
+	}
 	return err
 }
 
@@ -35,7 +38,7 @@ func (repo *UserRepo) GetByUUID(uuid string) (*model.User, error) {
 		if err == gorm.ErrRecordNotFound {
 			return nil, errors.New("user not found")
 		}
-		return nil, err
+		return nil, errors.New("failed to get user")
 	}
 	return &user, nil
 }
