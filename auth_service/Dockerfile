@@ -22,9 +22,3 @@ WORKDIR /root/
 
 # Copy the built binary from the builder image
 COPY --from=builder /app/auth_service .
-
-# Expose the port (optional, if your service exposes REST)
-EXPOSE 8001
-
-# Run the service
-CMD ["./auth_service", "--server=rest"]
