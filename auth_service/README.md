@@ -1,0 +1,1 @@
+# Gin Clean Architecture auth_service Boilerplate
