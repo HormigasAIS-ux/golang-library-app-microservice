@@ -1,0 +1,180 @@
+definitions:
+  dto.BaseJSONResp:
+    properties:
+      code:
+        type: integer
+      data: {}
+      detail:
+        type: string
+      message:
+        type: string
+    type: object
+  dto.CheckTokenReq:
+    properties:
+      access_token:
+        type: string
+    required:
+    - access_token
+    type: object
+  dto.CheckTokenRespData:
+    properties:
+      email:
+        type: string
+      fullname:
+        type: string
+      username:
+        type: string
+      uuid:
+        type: string
+    type: object
+  dto.LoginReq:
+    properties:
+      password:
+        type: string
+      username_or_email:
+        type: string
+    required:
+    - password
+    - username_or_email
+    type: object
+  dto.LoginRespData:
+    properties:
+      access_token:
+        type: string
+      refresh_token:
+        type: string
+    type: object
+  dto.RefreshTokenReq:
+    properties:
+      refresh_token:
+        type: string
+    required:
+    - refresh_token
+    type: object
+  dto.RefreshTokenRespData:
+    properties:
+      access_token:
+        type: string
+      refresh_token:
+        type: string
+    type: object
+  dto.RegisterUserReq:
+    properties:
+      email:
+        type: string
+      fullname:
+        type: string
+      password:
+        type: string
+      username:
+        type: string
+    required:
+    - email
+    - fullname
+    - password
+    - username
+    type: object
+  dto.RegisterUserRespData:
+    properties:
+      access_token:
+        type: string
+      refresh_token:
+        type: string
+    type: object
+info:
+  contact: {}
+  title: Auth Service RESTful API
+paths:
+  /auth/check-token:
+    post:
+      parameters:
+      - description: payload
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CheckTokenReq'
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/dto.BaseJSONResp'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.CheckTokenRespData'
+              type: object
+      tags:
+      - Auth
+  /auth/login:
+    post:
+      parameters:
+      - description: payload
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/dto.LoginReq'
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/dto.BaseJSONResp'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.LoginRespData'
+              type: object
+      summary: login
+      tags:
+      - Auth
+  /auth/refresh-token:
+    post:
+      parameters:
+      - description: payload
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/dto.RefreshTokenReq'
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/dto.BaseJSONResp'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.RefreshTokenRespData'
+              type: object
+      tags:
+      - Auth
+  /auth/register:
+    post:
+      parameters:
+      - description: payload
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/dto.RegisterUserReq'
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/dto.BaseJSONResp'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.RegisterUserRespData'
+              type: object
+      summary: register new user
+      tags:
+      - Auth
+securityDefinitions:
+  BearerAuth:
+    description: JWT Authorization header using the Bearer scheme (add 'Bearer ' prefix).
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"
