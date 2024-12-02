@@ -1,8 +1,8 @@
 package main
 
 import (
-	"auth_service/api/rest"
 	"auth_service/config"
+	"auth_service/interface/rest"
 	"fmt"
 	"os"
 	"strings"

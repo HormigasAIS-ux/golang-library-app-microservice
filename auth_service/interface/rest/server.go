@@ -1,14 +1,16 @@
 package rest
 
 import (
-	"auth_service/api/rest/handler"
 	"auth_service/config"
 	"auth_service/domain/dto"
+	"auth_service/interface/rest/handler"
 	"auth_service/middleware"
 	"auth_service/repository"
 	ucase "auth_service/usecase"
 	"auth_service/utils/http_response"
 	"context"
+
+	_ "auth_service/docs"
 
 	"github.com/gin-gonic/gin"
 	swaggerfiles "github.com/swaggo/files"
