@@ -306,3 +306,29 @@ func (s *AuthUcase) RefreshToken(payload rest.RefreshTokenReq) (*rest.RefreshTok
 		RefreshToken: newRefreshTokenObj.Token,
 	}, nil
 }
+
+func (s *AuthUcase) CheckToken(payload rest.CheckTokenReq) (*rest.CheckTokenResp, error) {
+	claims, err := jwt_util.ValidateJWT(payload.AccessToken, config.Envs.JWT_SECRET_KEY)
+	if err != nil {
+		logger.Errorf("error validating token: %v", err)
+		return nil, &error_utils.CustomErr{
+			HttpCode: 401,
+			Message:  "Invalid Access Token",
+			Detail:   err.Error(),
+		}
+	}
+
+	sub, _ := claims["sub"].(string)
+	username, _ := claims["username"].(string)
+	fullname, _ := claims["fullname"].(string)
+	email, _ := claims["email"].(string)
+
+	resp := &rest.CheckTokenResp{
+		UUID:     sub,
+		Username: username,
+		Fullname: fullname,
+		Email:    email,
+	}
+
+	return resp, nil
+}

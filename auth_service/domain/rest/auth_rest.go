@@ -26,6 +26,13 @@ type CheckTokenReq struct {
 	AccessToken string `json:"access_token" validate:"required"`
 }
 
+type CheckTokenResp struct {
+	UUID     string `json:"uuid"`
+	Username string `json:"username"`
+	Fullname string `json:"fullname"`
+	Email    string `json:"email"`
+}
+
 type RefreshTokenReq struct {
 	RefreshToken string `json:"refresh_token" validate:"required"`
 }
