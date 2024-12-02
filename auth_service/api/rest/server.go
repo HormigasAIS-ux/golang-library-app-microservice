@@ -3,6 +3,7 @@ package rest
 import (
 	"auth_service/api/rest/handler"
 	"auth_service/config"
+	"auth_service/domain/dto"
 	"auth_service/middleware"
 	"auth_service/repository"
 	ucase "auth_service/usecase"
@@ -24,16 +25,16 @@ func SetupServer(router *gin.Engine) {
 	userRepo := repository.NewUserRepo(gormDB)
 	refreshTokenRepo := repository.NewRefreshTokenRepo(gormDB)
 
-	// ucase
+	// ucases
 	authUcase := ucase.NewAuthUcase(userRepo, refreshTokenRepo)
 
 	// handlers
 	authHandler := handler.NewAuthHandler(responseWriter, authUcase)
 	_ = authHandler
 	router.GET("/ping", func(c *gin.Context) {
-		c.JSON(200, gin.H{
-			"error":   false,
-			"message": "pong!",
+		c.JSON(200, dto.BaseJSONResp{
+			Code:    200,
+			Message: "pong",
 		})
 	})
 
