@@ -1,4 +1,4 @@
-package rest
+package dto
 
 type BaseJSONResp struct {
 	Error   bool        `json:"error"`
