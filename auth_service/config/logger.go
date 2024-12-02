@@ -15,4 +15,14 @@ func ConfigureLogger() {
 	backend2Formatter := logging.NewBackendFormatter(backend2, format)
 
 	logging.SetBackend(backend2Formatter)
+	switch Envs.LOG_LEVEL {
+	case "debug":
+		logging.SetLevel(logging.DEBUG, "main")
+	case "info":
+		logging.SetLevel(logging.INFO, "main")
+	case "warning":
+		logging.SetLevel(logging.WARNING, "main")
+	case "error":
+		logging.SetLevel(logging.ERROR, "main")
+	}
 }
