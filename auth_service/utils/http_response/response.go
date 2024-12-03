@@ -7,19 +7,19 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type ResponseWriter struct{}
+type HttpResponseWriter struct{}
 
-type IResponseWriter interface {
+type IHttpResponseWriter interface {
 	HTTPCustomErr(ctx *gin.Context, err error)
 	HTTPJson(ctx *gin.Context, code int, message string, detail string, data interface{})
 	HTTPJsonOK(ctx *gin.Context, data interface{})
 }
 
-func NewResponseWriter() IResponseWriter {
-	return &ResponseWriter{}
+func NewHttpResponseWriter() IHttpResponseWriter {
+	return &HttpResponseWriter{}
 }
 
-func (r *ResponseWriter) HTTPCustomErr(ctx *gin.Context, err error) {
+func (r *HttpResponseWriter) HTTPCustomErr(ctx *gin.Context, err error) {
 	customErr, ok := err.(*error_utils.CustomErr)
 	if ok {
 		ctx.JSON(customErr.HttpCode, dto.BaseJSONResp{
@@ -38,7 +38,7 @@ func (r *ResponseWriter) HTTPCustomErr(ctx *gin.Context, err error) {
 	})
 }
 
-func (r *ResponseWriter) HTTPJson(ctx *gin.Context, code int, message string, detail string, data interface{}) {
+func (r *HttpResponseWriter) HTTPJson(ctx *gin.Context, code int, message string, detail string, data interface{}) {
 	ctx.JSON(code, dto.BaseJSONResp{
 		Code:    code,
 		Message: message,
@@ -47,7 +47,7 @@ func (r *ResponseWriter) HTTPJson(ctx *gin.Context, code int, message string, de
 	})
 }
 
-func (r *ResponseWriter) HTTPJsonOK(ctx *gin.Context, data interface{}) {
+func (r *HttpResponseWriter) HTTPJsonOK(ctx *gin.Context, data interface{}) {
 	ctx.JSON(200, dto.BaseJSONResp{
 		Code:    200,
 		Message: "OK",

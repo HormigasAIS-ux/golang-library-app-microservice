@@ -9,14 +9,14 @@ import (
 )
 
 type AuthHandler struct {
-	respWriter http_response.IResponseWriter
+	respWriter http_response.IHttpResponseWriter
 	authUcase  ucase.IAuthUcase
 }
 
 type IAuthHandler interface {
 }
 
-func NewAuthHandler(respWriter http_response.IResponseWriter, authUcase ucase.IAuthUcase) AuthHandler {
+func NewAuthHandler(respWriter http_response.IHttpResponseWriter, authUcase ucase.IAuthUcase) AuthHandler {
 	return AuthHandler{
 		respWriter: respWriter,
 		authUcase:  authUcase,

@@ -20,7 +20,7 @@ import (
 func SetupServer(router *gin.Engine) {
 	_ = context.Background()
 
-	responseWriter := http_response.NewResponseWriter()
+	responseWriter := http_response.NewHttpResponseWriter()
 	gormDB := config.NewPostgresqlDB()
 
 	// repositories
