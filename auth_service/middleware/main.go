@@ -7,7 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func AuthMiddleware(respWriter http_response.IResponseWriter, authService ucase.IAuthUcase) gin.HandlerFunc {
+func AuthMiddleware(respWriter http_response.IHttpResponseWriter, authService ucase.IAuthUcase) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		_ = c.GetHeader("Bearer")
 

@@ -12,8 +12,9 @@ message CheckTokenRequest {
 }
 
 message CheckTokenResponse {
-    string Username = 1;
-    string Email = 2;
-    string Password = 3;
-    string Fullname = 4;
+    string UUID = 1;
+    string Username = 2;
+    string Email = 3;
+    string Password = 4;
+    string Fullname = 5;
 }

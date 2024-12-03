@@ -13,6 +13,8 @@ import (
 	"fmt"
 	"strings"
 	"time"
+
+	"google.golang.org/grpc/codes"
 )
 
 type AuthUcase struct {
@@ -317,6 +319,7 @@ func (s *AuthUcase) CheckToken(payload dto.CheckTokenReq) (*dto.CheckTokenRespDa
 		logger.Errorf("error validating token: %v", err)
 		return nil, &error_utils.CustomErr{
 			HttpCode: 401,
+			GrpcCode: codes.Unauthenticated,
 			Message:  "Invalid Access Token",
 			Detail:   err.Error(),
 		}
