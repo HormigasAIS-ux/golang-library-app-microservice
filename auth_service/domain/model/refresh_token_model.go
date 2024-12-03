@@ -14,5 +14,5 @@ type RefreshToken struct {
 	ExpiredAt *time.Time `json:"expired_at"`
 	Invalid   bool       `json:"invalid"`
 
-	User User `gorm:"foreignKey:UUID;constraint:OnDelete:CASCADE;"`
+	User User `gorm:"foreignKey:UserUUID;constraint:OnDelete:CASCADE;"`
 }
