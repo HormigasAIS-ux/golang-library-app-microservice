@@ -8,13 +8,13 @@ service AuthService {
 }
 
 message CheckTokenRequest {
-    string AccessToken = 1;
+    string access_token = 1;
 }
 
 message CheckTokenResponse {
-    string UUID = 1;
-    string Username = 2;
-    string Email = 3;
-    string Password = 4;
-    string Fullname = 5;
+    string uuid = 1;
+    string username = 2;
+    string email = 3;
+    string password = 4;
+    string fullname = 5;
 }
