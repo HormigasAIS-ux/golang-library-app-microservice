@@ -45,17 +45,7 @@ This project consists of four services: `auth_service`, `book_service`, `categor
 
    - This will run the services using local images.
 
-### Stopping the Services
-
-To stop the services, run:
-
-```bash
-docker-compose down
-```
-
-----------------
-
-## Swagger RESTful API Documentation
+## Swagger API Documentation
 ### Available Swagger Endpoints
 - auth_service:
   `http://{host}:8001/swagger/index.html`
