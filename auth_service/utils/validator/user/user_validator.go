@@ -28,7 +28,7 @@ func ValidateEmail(email string) error {
 	return nil
 }
 
-func ValidateRawPassword(password string) error {
+func ValidatePassword(password string) error {
 	if password == "" {
 		return errors.New("password cannot be empty")
 	}
@@ -38,5 +38,13 @@ func ValidateRawPassword(password string) error {
 	if strings.Contains(password, " ") {
 		return errors.New("password cannot contain spaces")
 	}
+	return nil
+}
+
+func ValidateRole(role string) error {
+	if role != "admin" && role != "user" {
+		return errors.New("invalid role")
+	}
+
 	return nil
 }

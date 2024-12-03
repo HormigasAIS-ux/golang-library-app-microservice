@@ -3,11 +3,9 @@ package rest
 import (
 	"auth_service/config"
 	"auth_service/domain/dto"
-	"auth_service/domain/model"
+	interface_pkg "auth_service/interface"
 	"auth_service/interface/rest/handler"
 	"auth_service/middleware"
-	"auth_service/repository"
-	ucase "auth_service/usecase"
 	"auth_service/utils/http_response"
 	"fmt"
 
@@ -21,30 +19,13 @@ import (
 
 var logger = logging.MustGetLogger("rest")
 
-func SetupServer() {
+func SetupServer(commonDependencies interface_pkg.CommonDependency) {
 	router := gin.Default()
 
 	responseWriter := http_response.NewHttpResponseWriter()
-	gormDB := config.NewPostgresqlDB()
-
-	// migrations
-	err := gormDB.AutoMigrate(
-		&model.User{},
-		&model.RefreshToken{},
-	)
-	if err != nil {
-		logger.Fatalf("failed to migrate database: %v", err)
-	}
-
-	// repositories
-	userRepo := repository.NewUserRepo(gormDB)
-	refreshTokenRepo := repository.NewRefreshTokenRepo(gormDB)
-
-	// ucases
-	authUcase := ucase.NewAuthUcase(userRepo, refreshTokenRepo)
 
 	// handlers
-	authHandler := handler.NewAuthHandler(responseWriter, authUcase)
+	authHandler := handler.NewAuthHandler(responseWriter, commonDependencies.AuthUcase)
 	_ = authHandler
 
 	// register routes
@@ -61,7 +42,7 @@ func SetupServer() {
 
 	secureRouter := router.Group("/")
 	{
-		secureRouter.Use(middleware.AuthMiddleware(responseWriter, authUcase))
+		secureRouter.Use(middleware.AuthMiddleware(responseWriter, commonDependencies.AuthUcase))
 	}
 
 	// swagger

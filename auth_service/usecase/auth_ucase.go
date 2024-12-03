@@ -60,7 +60,7 @@ func (s *AuthUcase) Register(payload dto.RegisterUserReq) (*dto.RegisterUserResp
 		}
 	}
 
-	err = validator_util.ValidateRawPassword(payload.Password)
+	err = validator_util.ValidatePassword(payload.Password)
 	if err != nil {
 		logger.Errorf("error validating password: %s", err.Error())
 		return nil, &error_utils.CustomErr{
@@ -103,7 +103,13 @@ func (s *AuthUcase) Register(payload dto.RegisterUserReq) (*dto.RegisterUserResp
 		Password: password,
 		Fullname: payload.Fullname,
 		Email:    payload.Email,
+		Role:     "user",
 	}
+	err = user.Validate()
+	if err != nil {
+		return nil, err
+	}
+
 	err = s.userRepo.Create(user)
 	if err != nil {
 		return nil, err
@@ -164,7 +170,7 @@ func (s *AuthUcase) Login(payload dto.LoginReq) (*dto.LoginRespData, error) {
 	}
 
 	// validate password
-	err := validator_util.ValidateRawPassword(payload.Password)
+	err := validator_util.ValidatePassword(payload.Password)
 	if err != nil {
 		logger.Errorf("invalid password: %s\n%v", payload.Password, err)
 		return nil, &error_utils.CustomErr{

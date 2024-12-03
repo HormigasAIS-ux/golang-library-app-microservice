@@ -2,11 +2,9 @@ package grpc
 
 import (
 	"auth_service/config"
-	"auth_service/domain/model"
+	interface_pkg "auth_service/interface"
 	"auth_service/interface/grpc/genproto/auth"
 	"auth_service/interface/grpc/handler"
-	"auth_service/repository"
-	ucase "auth_service/usecase"
 	"fmt"
 	"log"
 	"net"
@@ -17,25 +15,7 @@ import (
 
 var logger = logging.MustGetLogger("main")
 
-func SetupServer() {
-	gormDB := config.NewPostgresqlDB()
-
-	// migrations
-	err := gormDB.AutoMigrate(
-		&model.User{},
-		&model.RefreshToken{},
-	)
-	if err != nil {
-		logger.Fatalf("failed to migrate database: %v", err)
-	}
-
-	// repositories
-	userRepo := repository.NewUserRepo(gormDB)
-	refreshTokenRepo := repository.NewRefreshTokenRepo(gormDB)
-
-	// ucases
-	authUcase := ucase.NewAuthUcase(userRepo, refreshTokenRepo)
-
+func SetupServer(commonDependencies interface_pkg.CommonDependency) {
 	// setup listener
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%v", config.Envs.GRPC_PORT))
 	if err != nil {
@@ -46,7 +26,7 @@ func SetupServer() {
 	grpcServer := grpc.NewServer()
 
 	// register service handler
-	authServiceHandler := handler.NewAuthServiceHandler(authUcase)
+	authServiceHandler := handler.NewAuthServiceHandler(commonDependencies.AuthUcase)
 	auth.RegisterAuthServiceServer(grpcServer, authServiceHandler)
 
 	// Start the server

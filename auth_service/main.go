@@ -2,8 +2,13 @@ package main
 
 import (
 	"auth_service/config"
+	"auth_service/domain/model"
+	interface_pkg "auth_service/interface"
 	"auth_service/interface/grpc"
 	"auth_service/interface/rest"
+	"auth_service/repository"
+	ucase "auth_service/usecase"
+	seeder_util "auth_service/utils/seeder/user"
 	"fmt"
 	"os"
 	"strings"
@@ -24,10 +29,39 @@ var logger = logging.MustGetLogger("main")
 // @name Authorization
 // @description JWT Authorization header using the Bearer scheme (add 'Bearer ' prefix).
 func main() {
+	gormDB := config.NewPostgresqlDB()
+
+	// migrations
+	err := gormDB.AutoMigrate(
+		&model.User{},
+		&model.RefreshToken{},
+	)
+	if err != nil {
+		logger.Fatalf("failed to migrate database: %v", err)
+	}
+
+	// prepare dependencies
+	// repositories
+	userRepo := repository.NewUserRepo(gormDB)
+	refreshTokenRepo := repository.NewRefreshTokenRepo(gormDB)
+
+	// ucases
+	authUcase := ucase.NewAuthUcase(userRepo, refreshTokenRepo)
+
+	dependencies := interface_pkg.CommonDependency{
+		AuthUcase: authUcase,
+	}
+
+	// seed data
+	err = seeder_util.SeedUser(userRepo)
+	if err != nil {
+		logger.Fatalf("failed to seed user: %v", err)
+	}
+
 	args := os.Args
 	if len(args) == 1 { // run as a rest server
 		logger.Info("starting rest server...")
-		rest.SetupServer()
+		rest.SetupServer(dependencies)
 	} else if len(args) > 1 {
 		validArgVariables := []string{"server"}
 
@@ -50,10 +84,10 @@ func main() {
 				switch value {
 				case "rest":
 					logger.Info("starting rest server...")
-					rest.SetupServer()
+					rest.SetupServer(dependencies)
 				case "grpc":
 					logger.Info("starting grpc server...")
-					grpc.SetupServer()
+					grpc.SetupServer(dependencies)
 				default:
 					logger.Fatalf("invalid argument: %s", arg)
 				}
