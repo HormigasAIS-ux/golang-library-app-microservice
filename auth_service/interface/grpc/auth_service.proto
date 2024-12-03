@@ -4,15 +4,16 @@ package auth_service;
 option go_package = "auth_service/interface/grpc/genproto";
 
 service AuthService {
-  rpc CheckToken(CheckTokenRequest) returns (CheckTokenResponse);
+    rpc CheckToken(CheckTokenRequest) returns (CheckTokenResponse);
 }
 
 message CheckTokenRequest {
-  string token = 1;  // The token to be validated
+    string AccessToken = 1;
 }
 
 message CheckTokenResponse {
-  bool is_valid = 1;  // Whether the token is valid
-  string user_id = 2; // The user ID associated with the token, if valid
-  string error_message = 3; // Error message if the token is invalid
+    string Username = 1;
+    string Email = 2;
+    string Password = 3;
+    string Fullname = 4;
 }
