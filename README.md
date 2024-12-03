@@ -51,3 +51,17 @@ To stop the services, run:
 
 ```bash
 docker-compose down
+```
+
+----------------
+
+## Swagger RESTful API Documentation
+### Available Swagger Endpoints
+- auth_service:
+  `http://{host}:8001/swagger/index.html`
+
+- book_service: Not implemented yet
+
+- category_service: Not implemented yet
+
+- author_service: Not implemented yet
