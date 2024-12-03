@@ -1,7 +1,7 @@
 syntax = "proto3";
 
 package auth_service;
-option go_package = "auth_service/interface/grpc/genproto";
+option go_package = "auth_service/interface/grpc/genproto/auth";
 
 service AuthService {
     rpc CheckToken(CheckTokenRequest) returns (CheckTokenResponse);

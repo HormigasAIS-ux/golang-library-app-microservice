@@ -1,6 +1,6 @@
 gen:
 	@protoc \
-		--proto_path=interface/grpc \
-		interface/grpc/auth_service.proto \
-		--go_out=interface/grpc/genproto --go_opt=paths=source_relative \
-		--go-grpc_out=interface/grpc/genproto --go-grpc_opt=paths=source_relative
+		--proto_path=interface/grpc/proto \
+		interface/grpc/proto/auth.proto \
+		--go_out=interface/grpc/genproto/auth --go_opt=paths=source_relative \
+		--go-grpc_out=interface/grpc/genproto/auth --go-grpc_opt=paths=source_relative
