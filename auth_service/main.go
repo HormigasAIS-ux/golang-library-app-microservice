@@ -2,12 +2,12 @@ package main
 
 import (
 	"auth_service/config"
+	"auth_service/interface/grpc"
 	"auth_service/interface/rest"
 	"fmt"
 	"os"
 	"strings"
 
-	"github.com/gin-gonic/gin"
 	"github.com/op/go-logging"
 )
 
@@ -18,13 +18,6 @@ func init() {
 
 var logger = logging.MustGetLogger("main")
 
-func runRestServer() {
-	logger.Info("starting rest server...")
-	router := gin.Default()
-	rest.SetupServer(router)
-	router.Run(fmt.Sprintf("%s:%d", config.Envs.HOST, config.Envs.PORT))
-}
-
 // @title Auth Service RESTful API
 // @securitydefinitions.apiKey BearerAuth
 // @in header
@@ -33,7 +26,8 @@ func runRestServer() {
 func main() {
 	args := os.Args
 	if len(args) == 1 { // run as a rest server
-		runRestServer()
+		logger.Info("starting rest server...")
+		rest.SetupServer()
 	} else if len(args) > 1 {
 		validArgVariables := []string{"server"}
 
@@ -55,9 +49,11 @@ func main() {
 
 				switch value {
 				case "rest":
-					runRestServer()
+					logger.Info("starting rest server...")
+					rest.SetupServer()
 				case "grpc":
-					logger.Fatalf("grpc not implemented yet")
+					logger.Info("starting grpc server...")
+					grpc.SetupServer()
 				default:
 					logger.Fatalf("invalid argument: %s", arg)
 				}

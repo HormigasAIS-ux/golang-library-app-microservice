@@ -9,7 +9,7 @@ import (
 	"auth_service/repository"
 	ucase "auth_service/usecase"
 	"auth_service/utils/http_response"
-	"context"
+	"fmt"
 
 	_ "auth_service/docs"
 
@@ -21,8 +21,8 @@ import (
 
 var logger = logging.MustGetLogger("rest")
 
-func SetupServer(router *gin.Engine) {
-	_ = context.Background()
+func SetupServer() {
+	router := gin.Default()
 
 	responseWriter := http_response.NewHttpResponseWriter()
 	gormDB := config.NewPostgresqlDB()
@@ -66,4 +66,6 @@ func SetupServer(router *gin.Engine) {
 
 	// swagger
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
+
+	router.Run(fmt.Sprintf("%s:%d", config.Envs.HOST, config.Envs.PORT))
 }
