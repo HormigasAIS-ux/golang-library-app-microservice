@@ -1,12 +1,10 @@
 package helper
 
 import (
-	"github.com/google/uuid"
+	"encoding/json"
+	"fmt"
+	"time"
 )
-
-func GenerateUUID() string {
-	return uuid.New().String()
-}
 
 func ArrayContains(arr interface{}, item interface{}) bool {
 	newArr, ok := arr.([]interface{})
@@ -20,4 +18,16 @@ func ArrayContains(arr interface{}, item interface{}) bool {
 		}
 	}
 	return false
+}
+
+func PrettyJson(data interface{}) string {
+	res, err := json.MarshalIndent(data, "", "  ")
+	if err != nil {
+		return fmt.Sprintf("<failed to parse json: %v>", err.Error())
+	}
+	return string(res)
+}
+
+func TimeNowUTC() time.Time {
+	return time.Now().UTC()
 }

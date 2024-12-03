@@ -16,6 +16,9 @@ func ValidateUsername(username string) error {
 }
 
 func ValidateEmail(email string) error {
+	if strings.Contains(email, " ") {
+		return errors.New("email cannot contain spaces")
+	}
 	if email == "" {
 		return errors.New("email cannot be empty")
 	}
