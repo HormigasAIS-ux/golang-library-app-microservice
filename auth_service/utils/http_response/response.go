@@ -24,9 +24,9 @@ func (r *HttpResponseWriter) HTTPCustomErr(ctx *gin.Context, err error) {
 	if ok {
 		ctx.JSON(customErr.HttpCode, dto.BaseJSONResp{
 			Code:    customErr.HttpCode,
-			Message: customErr.Error(),
-			Detail:  "",
-			Data:    nil,
+			Message: customErr.Message,
+			Detail:  customErr.Detail,
+			Data:    customErr.Data,
 		})
 		return
 	}
