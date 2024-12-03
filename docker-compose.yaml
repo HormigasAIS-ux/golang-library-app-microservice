@@ -30,6 +30,19 @@ services:
     depends_on:
       - backend_syn_db
 
+  syn_auth_service_grpc:
+    image: ${AUTH_SERVICE_IMAGE}
+    container_name: syn_auth_service_grpc
+    command: ["./auth_service", "--server=grpc"]
+    ports:
+      - "7001:7001"
+    networks:
+      - my_network
+    env_file:
+      - ./auth_service/.env
+    depends_on:
+      - backend_syn_db
+
 volumes:
   postgres_data:
 
