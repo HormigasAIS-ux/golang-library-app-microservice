@@ -12,7 +12,7 @@ func GenerateJwtToken(user *model.User, secretKey string, expHours int, tokenId 
 	JWT_SIGNATURE_KEY := []byte(secretKey)
 
 	claims := jwt.MapClaims{
-		"sub":      user.UUID,
+		"sub":      user.UUID.String(),
 		"username": user.Username,
 		"fullname": user.Fullname,
 		"email":    user.Email,

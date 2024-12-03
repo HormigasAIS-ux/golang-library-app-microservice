@@ -16,6 +16,10 @@ type AuthServiceHandler struct {
 	authService ucase.IAuthUcase
 }
 
+func NewAuthServiceHandler(authService ucase.IAuthUcase) *AuthServiceHandler {
+	return &AuthServiceHandler{authService: authService}
+}
+
 func (h *AuthServiceHandler) CheckToken(ctx context.Context, req *auth.CheckTokenRequest) (*auth.CheckTokenResponse, error) {
 	// payload validation
 	payload := dto.CheckTokenReq{
@@ -35,7 +39,7 @@ func (h *AuthServiceHandler) CheckToken(ctx context.Context, req *auth.CheckToke
 	}
 
 	resp := &auth.CheckTokenResponse{
-		UUID:     raw.UUID,
+		Uuid:     raw.UUID,
 		Username: raw.Username,
 		Email:    raw.Email,
 		Fullname: raw.Fullname,
