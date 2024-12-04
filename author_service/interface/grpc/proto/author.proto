@@ -1,0 +1,7 @@
+syntax = "proto3";
+
+package author_service;
+option go_package = "auth_service/interface/grpc/genproto/author";
+
+service AuthService {
+}

@@ -1,0 +1,99 @@
+definitions:
+  dto.BaseJSONResp:
+    properties:
+      code:
+        type: integer
+      data: {}
+      detail:
+        type: string
+      message:
+        type: string
+    type: object
+  dto.GetAuthorListRespData:
+    properties:
+      current_page:
+        type: integer
+      data:
+        items:
+          $ref: '#/definitions/dto.GetAuthorListRespDataItem'
+        type: array
+      total_data:
+        type: integer
+      total_page:
+        type: integer
+    type: object
+  dto.GetAuthorListRespDataItem:
+    properties:
+      bio:
+        type: string
+      birth_date:
+        type: string
+      created_at:
+        type: string
+      first_name:
+        type: string
+      last_name:
+        type: string
+      updated_at:
+        type: string
+      uuid:
+        type: string
+    type: object
+info:
+  contact: {}
+  title: Author Service RESTful API
+paths:
+  /authors:
+    get:
+      parameters:
+      - default: 10
+        in: query
+        name: limit
+        type: integer
+      - default: 1
+        in: query
+        name: page
+        type: integer
+      - in: query
+        name: query
+        type: string
+      - default: any
+        enum:
+        - first_name
+        - last_name
+        - birth_date
+        - any
+        in: query
+        name: query_by
+        type: string
+      - default: created_at
+        in: query
+        name: sort_by
+        type: string
+      - enum:
+        - asc
+        - desc
+        in: query
+        name: sort_order
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/dto.BaseJSONResp'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.GetAuthorListRespData'
+              type: object
+      summary: Get Author List
+      tags:
+      - Authors
+securityDefinitions:
+  BearerAuth:
+    description: JWT Authorization header using the Bearer scheme (add 'Bearer ' prefix).
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"
