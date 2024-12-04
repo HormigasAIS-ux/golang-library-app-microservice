@@ -56,7 +56,7 @@ message UpdateUserReq {
     bool username_null = 5;
     bool email_null = 6;
     bool password_null = 7;
-    bool role_null = 7;
+    bool role_null = 8;
 }
 
 message UpdateUserResp {
