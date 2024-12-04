@@ -5,6 +5,7 @@ option go_package = "auth_service/interface/grpc/genproto/auth";
 
 service AuthService {
     rpc CheckToken(CheckTokenRequest) returns (CheckTokenResponse);
+    rpc GetUserByUUID(GetUserByUUIDRequest) returns (GetUserByUUIDResponse);
 }
 
 message CheckTokenRequest {
@@ -12,6 +13,18 @@ message CheckTokenRequest {
 }
 
 message CheckTokenResponse {
+    string uuid = 1;
+    string username = 2;
+    string email = 3;
+    string password = 4;
+    string fullname = 5;
+}
+
+message GetUserByUUIDRequest {
+    string uuid = 1;
+}
+
+message GetUserByUUIDResponse {
     string uuid = 1;
     string username = 2;
     string email = 3;
