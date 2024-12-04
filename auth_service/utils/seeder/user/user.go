@@ -5,6 +5,7 @@ import (
 	"auth_service/domain/model"
 	author_pb "auth_service/interface/grpc/genproto/author"
 	"auth_service/repository"
+	bcrypt_util "auth_service/utils/bcrypt"
 	"context"
 	"fmt"
 
@@ -19,10 +20,11 @@ func SeedUser(userRepo repository.IUserRepo, authorRepo repository.IAuthorRepo) 
 	users := []model.User{}
 
 	if config.Envs.INITIAL_ADMIN_USERNAME != "" && config.Envs.INITIAL_ADMIN_PASSWORD != "" {
+		hashedPassword, _ := bcrypt_util.Hash(config.Envs.INITIAL_ADMIN_PASSWORD)
 		users = append(users, model.User{
 			UUID:     uuid.New(),
 			Username: config.Envs.INITIAL_ADMIN_USERNAME,
-			Password: config.Envs.INITIAL_ADMIN_PASSWORD,
+			Password: hashedPassword,
 			Email:    fmt.Sprint(config.Envs.INITIAL_ADMIN_USERNAME, "@gmail.com"),
 			Role:     "admin",
 		})
@@ -31,10 +33,11 @@ func SeedUser(userRepo repository.IUserRepo, authorRepo repository.IAuthorRepo) 
 	}
 
 	if config.Envs.INITIAL_USER_USERNAME != "" && config.Envs.INITIAL_USER_PASSWORD != "" {
+		hashedPassword, _ := bcrypt_util.Hash(config.Envs.INITIAL_USER_PASSWORD)
 		users = append(users, model.User{
 			UUID:     uuid.New(),
 			Username: config.Envs.INITIAL_USER_USERNAME,
-			Password: config.Envs.INITIAL_USER_PASSWORD,
+			Password: hashedPassword,
 			Email:    fmt.Sprint(config.Envs.INITIAL_USER_USERNAME, "@gmail.com"),
 			Role:     "user",
 		})
