@@ -131,7 +131,7 @@ func main() {
 
 				switch value {
 				case "user":
-					err = seeder_util.SeedUser(userRepo)
+					err = seeder_util.SeedUser(userRepo, authorRepo)
 					if err != nil {
 						logger.Fatalf("failed to seed user: %v", err)
 					}
