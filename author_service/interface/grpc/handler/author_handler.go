@@ -5,8 +5,8 @@ import (
 	author_pb "author_service/interface/grpc/genproto/author"
 	ucase "author_service/usecase"
 	error_utils "author_service/utils/error"
-	"context"
 
+	"github.com/gin-gonic/gin"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
@@ -21,7 +21,7 @@ func NewAuthorServiceHandler(authService ucase.IAuthorUcase) *AuthorServiceHandl
 }
 
 func (r *AuthorServiceHandler) CreateAuthor(
-	ctx context.Context,
+	ctx *gin.Context,
 	payload *author_pb.CreateAuthorReq,
 ) (*author_pb.CreateAuthorResp, error) {
 	// payload validation
@@ -50,7 +50,7 @@ func (r *AuthorServiceHandler) CreateAuthor(
 		payloadDto.Bio = &payload.Bio
 	}
 
-	raw, err := r.authorService.CreateNewAuthor(ctx, nil, payloadDto)
+	raw, err := r.authorService.CreateNewAuthor(ctx, payloadDto)
 	if err != nil {
 		customErr, ok := err.(*error_utils.CustomErr)
 		if ok {

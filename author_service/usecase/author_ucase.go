@@ -12,18 +12,19 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"github.com/op/go-logging"
+	"google.golang.org/grpc/codes"
 )
 
 var logger = logging.MustGetLogger("main")
 
 type AuthorUcase struct {
 	authorRepo repository.IAuthorRepo
+	authRepo   repository.IAuthRepo
 }
 
 type IAuthorUcase interface {
 	CreateNewAuthor(
 		ctx context.Context,
-		ginCtx *gin.Context,
 		payload dto.CreateNewAuthorReq,
 	) (*dto.CreateNewAuthorRespData, error) // admin only
 	EditAuthor(
@@ -38,15 +39,18 @@ type IAuthorUcase interface {
 	) ([]dto.GetAuthorListRespDataItem, int64, error)
 }
 
-func NewAuthorUcase(authorRepo repository.IAuthorRepo) IAuthorUcase {
+func NewAuthorUcase(
+	authorRepo repository.IAuthorRepo,
+	authRepo repository.IAuthRepo,
+) IAuthorUcase {
 	return &AuthorUcase{
 		authorRepo: authorRepo,
+		authRepo:   authRepo,
 	}
 }
 
 func (u *AuthorUcase) CreateNewAuthor(
 	ctx context.Context,
-	ginCtx *gin.Context,
 	payload dto.CreateNewAuthorReq,
 ) (*dto.CreateNewAuthorRespData, error) {
 	var parsedUserUUID uuid.UUID
@@ -56,8 +60,40 @@ func (u *AuthorUcase) CreateNewAuthor(
 	var err error
 
 	if payload.UserUUID != nil { // user uuid provided for auth service grpc call
-		// TODO: get user from auth service
-		getUserResp := auth_pb.GetUserByUUIDResponse{}
+		getUserResp, grpcCode, err := u.authRepo.RpcGetUserByUUID(
+			ctx,
+			&auth_pb.GetUserByUUIDRequest{
+				Uuid: *payload.UserUUID,
+			},
+		)
+		if grpcCode != codes.OK {
+			switch grpcCode {
+			case codes.NotFound:
+				return nil, &error_utils.CustomErr{
+					HttpCode: 400,
+					GrpcCode: grpcCode,
+					Message:  err.Error(),
+					Detail:   err.Error(),
+				}
+			default:
+				return nil, &error_utils.CustomErr{
+					HttpCode: 500,
+					GrpcCode: grpcCode,
+					Message:  err.Error(),
+					Detail:   err.Error(),
+				}
+			}
+		}
+
+		if getUserResp == nil {
+			return nil, &error_utils.CustomErr{
+				HttpCode: 500,
+				GrpcCode: grpcCode,
+				Message:  "internal server error",
+				Detail:   "get user response is nil",
+			}
+		}
+
 		parsedUserUUID, err = uuid.Parse(getUserResp.Uuid)
 		if err != nil {
 			return nil, err
@@ -65,18 +101,54 @@ func (u *AuthorUcase) CreateNewAuthor(
 		userEmail = getUserResp.Email
 		userUsername = getUserResp.Username
 		userRole = getUserResp.Role
+
 	} else { // user uuid not provided for client call
-		// TODO: create user through auth service
-		createdUser := auth_pb.CreateUserResp{}
-		// TODO: handle username or email already exist error
-		parsedUserUUID, err = uuid.Parse(createdUser.Uuid)
+		createUserResp, grpcCode, err := u.authRepo.RpcCreateUser(
+			ctx,
+			&auth_pb.CreateUserReq{
+				Email:    payload.Email,
+				Username: payload.Username,
+				Password: payload.Password,
+				Role:     payload.Role,
+			},
+		)
+
+		if grpcCode != codes.OK {
+			switch grpcCode {
+			case codes.AlreadyExists:
+				return nil, &error_utils.CustomErr{
+					HttpCode: 400,
+					GrpcCode: grpcCode,
+					Message:  err.Error(),
+					Detail:   err.Error(),
+				}
+			default:
+				return nil, &error_utils.CustomErr{
+					HttpCode: 500,
+					GrpcCode: grpcCode,
+					Message:  err.Error(),
+					Detail:   err.Error(),
+				}
+			}
+		}
+
+		if createUserResp == nil {
+			return nil, &error_utils.CustomErr{
+				HttpCode: 500,
+				GrpcCode: grpcCode,
+				Message:  "internal server error",
+				Detail:   "create user resp is nil",
+			}
+		}
+
+		parsedUserUUID, err = uuid.Parse(createUserResp.Uuid)
 		if err != nil {
 			return nil, err
 		}
 
-		userEmail = createdUser.Email
-		userUsername = createdUser.Username
-		userRole = createdUser.Role
+		userEmail = createUserResp.Email
+		userUsername = createUserResp.Username
+		userRole = createUserResp.Role
 	}
 
 	newAuthor := &model.Author{
@@ -168,35 +240,49 @@ func (u *AuthorUcase) EditAuthor(
 		}
 	}
 
-	updateUserReq := auth_pb.UpdateUserReq{Uuid: author.UserUUID.String()}
+	// update user through auth service grpc
+	updateUserReqPayload := auth_pb.UpdateUserReq{Uuid: author.UserUUID.String()}
 	if payload.Username != nil {
-		updateUserReq.Username = *payload.Username
+		updateUserReqPayload.Username = *payload.Username
 	} else {
-		updateUserReq.UsernameNull = true
+		updateUserReqPayload.UsernameNull = true
 	}
 
 	if payload.Email != nil {
-		updateUserReq.Email = *payload.Email
+		updateUserReqPayload.Email = *payload.Email
 	} else {
-		updateUserReq.EmailNull = true
+		updateUserReqPayload.EmailNull = true
 	}
 
 	if payload.Password != nil {
-		updateUserReq.Password = *payload.Password
+		updateUserReqPayload.Password = *payload.Password
 	} else {
-		updateUserReq.PasswordNull = true
+		updateUserReqPayload.PasswordNull = true
 	}
 
 	if payload.Role != nil {
-		updateUserReq.Role = *payload.Role
+		updateUserReqPayload.Role = *payload.Role
 	} else {
-		updateUserReq.RoleNull = true
+		updateUserReqPayload.RoleNull = true
 	}
 
-	// TODO: edit user through auth service
-	updatedUser := auth_pb.UpdateUserResp{}
-	if err != nil {
-		return nil, err
+	updateUserResp, grpcCode, err := u.authRepo.RpcUpdateUser(ctx, &updateUserReqPayload)
+	if grpcCode != codes.OK || err != nil {
+		return nil, &error_utils.CustomErr{
+			HttpCode: 500,
+			GrpcCode: codes.Internal,
+			Message:  "internal server error",
+			Detail:   err.Error(),
+		}
+	}
+
+	if updateUserResp == nil {
+		return nil, &error_utils.CustomErr{
+			HttpCode: 500,
+			GrpcCode: codes.Internal,
+			Message:  "internal server error",
+			Detail:   "update user response is nil",
+		}
 	}
 
 	// prepare update author
@@ -238,17 +324,15 @@ func (u *AuthorUcase) EditAuthor(
 		LastName:  author.LastName,
 		BirthDate: author.BirthDate,
 		Bio:       author.Bio,
-		Email:     updatedUser.Email,
-		Username:  updatedUser.Username,
-		Role:      updatedUser.Role,
+		Email:     updateUserResp.Email,
+		Username:  updateUserResp.Username,
+		Role:      updateUserResp.Role,
 	}
 
 	return respData, nil
 }
 
 func (u *AuthorUcase) DeleteAuthor(ctx *gin.Context, authorUUID string) (*dto.DeleteAuthorRespData, error) {
-	// TODO: delete user through auth service
-	deletedUser := auth_pb.DeleteUserResp{}
 
 	author, err := u.authorRepo.GetByUUID(authorUUID)
 	if err != nil {
@@ -262,6 +346,27 @@ func (u *AuthorUcase) DeleteAuthor(ctx *gin.Context, authorUUID string) (*dto.De
 		return nil, err
 	}
 
+	// delete user through auth service
+	deleteUserResp, grpcCode, err := u.authRepo.RpcDeleteUser(ctx, &auth_pb.DeleteUserReq{Uuid: authorUUID})
+	if grpcCode != codes.OK || err != nil {
+		return nil, &error_utils.CustomErr{
+			HttpCode: 500,
+			GrpcCode: codes.Internal,
+			Message:  "internal server error",
+			Detail:   err.Error(),
+		}
+	}
+
+	if deleteUserResp == nil {
+		return nil, &error_utils.CustomErr{
+			HttpCode: 500,
+			GrpcCode: codes.Internal,
+			Message:  "internal server error",
+			Detail:   "delete user response is nil",
+		}
+	}
+
+	// delete author
 	err = u.authorRepo.Delete(author.UUID.String())
 	if err != nil {
 		if err.Error() == "not found" {
@@ -278,13 +383,13 @@ func (u *AuthorUcase) DeleteAuthor(ctx *gin.Context, authorUUID string) (*dto.De
 		CreatedAt: author.CreatedAt,
 		UpdatedAt: author.UpdatedAt,
 		UserUUID:  author.UserUUID,
-		Email:     deletedUser.Email,
-		Username:  deletedUser.Username,
+		Email:     deleteUserResp.Email,
+		Username:  deleteUserResp.Username,
 		FirstName: author.FirstName,
 		LastName:  author.LastName,
 		BirthDate: author.BirthDate,
 		Bio:       author.Bio,
-		Role:      deletedUser.Role,
+		Role:      deleteUserResp.Role,
 	}, nil
 }
 
@@ -321,9 +426,6 @@ func (u *AuthorUcase) GetAuthorDetail(ctx *gin.Context, authorUUID string) (*dto
 		authorUUID = myAuthor.UUID.String()
 	}
 
-	// TODO: get user through auth service
-	user := auth_pb.GetUserByUUIDResponse{}
-
 	author, err := u.authorRepo.GetByUUID(authorUUID)
 	if err != nil {
 		if err.Error() == "not found" {
@@ -336,6 +438,31 @@ func (u *AuthorUcase) GetAuthorDetail(ctx *gin.Context, authorUUID string) (*dto
 		return nil, err
 	}
 
+	// get user through auth service
+	getUserResp, grpcCode, err := u.authRepo.RpcGetUserByUUID(
+		ctx,
+		&auth_pb.GetUserByUUIDRequest{
+			Uuid: author.UserUUID.String(),
+		},
+	)
+	if grpcCode != codes.OK {
+		return nil, &error_utils.CustomErr{
+			HttpCode: 500,
+			GrpcCode: grpcCode,
+			Message:  err.Error(),
+			Detail:   err.Error(),
+		}
+	}
+
+	if getUserResp == nil {
+		return nil, &error_utils.CustomErr{
+			HttpCode: 500,
+			GrpcCode: grpcCode,
+			Message:  "internal server error",
+			Detail:   "user resp is nil",
+		}
+	}
+
 	// TODO: get book total by author uuid through book service
 	bookTotalResp := book_pb.GetBookTotalByAuthorUUIDResp{}
 
@@ -344,13 +471,13 @@ func (u *AuthorUcase) GetAuthorDetail(ctx *gin.Context, authorUUID string) (*dto
 		CreatedAt: author.CreatedAt,
 		UpdatedAt: author.UpdatedAt,
 		UserUUID:  author.UserUUID,
-		Email:     user.Email,
-		Username:  user.Username,
+		Email:     getUserResp.Email,
+		Username:  getUserResp.Username,
 		FirstName: author.FirstName,
 		LastName:  author.LastName,
 		BirthDate: author.BirthDate,
 		Bio:       author.Bio,
-		Role:      user.Role,
+		Role:      getUserResp.Role,
 		BookTotal: bookTotalResp.BookTotal,
 	}
 
