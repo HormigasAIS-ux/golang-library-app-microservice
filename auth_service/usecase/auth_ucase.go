@@ -4,6 +4,7 @@ import (
 	"auth_service/config"
 	"auth_service/domain/dto"
 	"auth_service/domain/model"
+	author_pb "auth_service/interface/grpc/genproto/author"
 	"auth_service/repository"
 	bcrypt_util "auth_service/utils/bcrypt"
 	error_utils "auth_service/utils/error"
@@ -14,6 +15,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"google.golang.org/grpc/codes"
 )
@@ -21,10 +23,11 @@ import (
 type AuthUcase struct {
 	userRepo         repository.IUserRepo
 	refreshTokenRepo repository.IRefreshTokenRepo
+	authorRepo       repository.IAuthorRepo
 }
 
 type IAuthUcase interface {
-	Register(payload dto.RegisterUserReq) (*dto.RegisterUserRespData, error)
+	Register(ctx *gin.Context, payload dto.RegisterUserReq) (*dto.RegisterUserRespData, error)
 	Login(payload dto.LoginReq) (*dto.LoginRespData, error)
 	RefreshToken(payload dto.RefreshTokenReq) (*dto.RefreshTokenRespData, error)
 	CheckToken(payload dto.CheckTokenReq) (*dto.CheckTokenRespData, error)
@@ -33,14 +36,16 @@ type IAuthUcase interface {
 func NewAuthUcase(
 	userRepo repository.IUserRepo,
 	refreshTokenRepo repository.IRefreshTokenRepo,
+	authorRepo repository.IAuthorRepo,
 ) IAuthUcase {
 	return &AuthUcase{
 		userRepo:         userRepo,
 		refreshTokenRepo: refreshTokenRepo,
+		authorRepo:       authorRepo,
 	}
 }
 
-func (s *AuthUcase) Register(payload dto.RegisterUserReq) (*dto.RegisterUserRespData, error) {
+func (s *AuthUcase) Register(ctx *gin.Context, payload dto.RegisterUserReq) (*dto.RegisterUserRespData, error) {
 	// validate input
 	err := validator_util.ValidateUsername(payload.Username)
 	if err != nil {
@@ -94,6 +99,26 @@ func (s *AuthUcase) Register(payload dto.RegisterUserReq) (*dto.RegisterUserResp
 	if err != nil {
 		logger.Errorf("error hashing password: %v", err)
 		return nil, err
+	}
+
+	// create author through author service
+	_, grpcCode, err := s.authorRepo.RpcCreateAuthor(
+		ctx,
+		&author_pb.CreateAuthorReq{
+			FirstName: payload.Username,
+			LastName:  "",
+			BirthDate: "",
+			Bio:       "",
+		},
+	)
+
+	if grpcCode != codes.OK || err != nil {
+		logger.Errorf("error creating author: %v", err)
+		return nil, &error_utils.CustomErr{
+			HttpCode: 500,
+			Message:  "error creating author",
+			Detail:   err,
+		}
 	}
 
 	// create user

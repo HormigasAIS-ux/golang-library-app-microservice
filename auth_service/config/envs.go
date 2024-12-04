@@ -22,6 +22,8 @@ type EnvsSchema struct {
 	INITIAL_USER_PASSWORD  string
 	INITIAL_ADMIN_USERNAME string
 	INITIAL_ADMIN_PASSWORD string
+
+	AUTHOR_GRPC_SERVICE string
 }
 
 var Envs *EnvsSchema
@@ -45,6 +47,8 @@ func envInitiator() {
 		INITIAL_USER_PASSWORD:  viper.GetString("INITIAL_USER_PASSWORD"),
 		INITIAL_ADMIN_USERNAME: viper.GetString("INITIAL_ADMIN_USERNAME"),
 		INITIAL_ADMIN_PASSWORD: viper.GetString("INITIAL_ADMIN_PASSWORD"),
+
+		AUTHOR_GRPC_SERVICE: viper.GetString("AUTHOR_GRPC_SERVICE"),
 	}
 }
 

@@ -37,7 +37,7 @@ func (h *AuthHandler) Register(ctx *gin.Context) {
 		return
 	}
 
-	data, err := h.authUcase.Register(payload)
+	data, err := h.authUcase.Register(ctx, payload)
 	if err != nil {
 		h.respWriter.HTTPCustomErr(ctx, err)
 		return

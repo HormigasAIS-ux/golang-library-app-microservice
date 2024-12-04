@@ -33,6 +33,7 @@ func main() {
 	logger.Debugf("Envs: %v", helper.PrettyJson(config.Envs))
 
 	gormDB := config.NewPostgresqlDB()
+	authorGrpcServiceClient := config.NewAuthorGrpcServiceClient()
 
 	// migrations
 	err := gormDB.AutoMigrate(
@@ -47,9 +48,10 @@ func main() {
 	// repositories
 	userRepo := repository.NewUserRepo(gormDB)
 	refreshTokenRepo := repository.NewRefreshTokenRepo(gormDB)
+	authorRepo := repository.NewAuthorRepo(authorGrpcServiceClient)
 
 	// ucases
-	authUcase := ucase.NewAuthUcase(userRepo, refreshTokenRepo)
+	authUcase := ucase.NewAuthUcase(userRepo, refreshTokenRepo, authorRepo)
 
 	dependencies := interface_pkg.CommonDependency{
 		AuthUcase: authUcase,
