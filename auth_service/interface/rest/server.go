@@ -5,7 +5,6 @@ import (
 	"auth_service/domain/dto"
 	interface_pkg "auth_service/interface"
 	"auth_service/interface/rest/handler"
-	"auth_service/middleware"
 	"auth_service/utils/http_response"
 	"fmt"
 
@@ -39,11 +38,6 @@ func SetupServer(commonDependencies interface_pkg.CommonDependency) {
 	router.POST("/auth/login", authHandler.Login)
 	router.POST("/auth/check-token", authHandler.CheckToken)
 	router.POST("/auth/refresh-token", authHandler.RefreshToken)
-
-	secureRouter := router.Group("/")
-	{
-		secureRouter.Use(middleware.AuthMiddleware(responseWriter, commonDependencies.AuthUcase))
-	}
 
 	// swagger
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
