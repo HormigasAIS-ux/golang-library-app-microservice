@@ -101,7 +101,6 @@ func (s *AuthUcase) Register(payload dto.RegisterUserReq) (*dto.RegisterUserResp
 		UUID:     uuid.New(),
 		Username: payload.Username,
 		Password: password,
-		Fullname: payload.Fullname,
 		Email:    payload.Email,
 		Role:     "user",
 	}

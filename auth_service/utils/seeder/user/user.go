@@ -20,7 +20,6 @@ func SeedUser(userRepo repository.IUserRepo) error {
 			UUID:     uuid.New(),
 			Username: config.Envs.INITIAL_ADMIN_USERNAME,
 			Password: config.Envs.INITIAL_ADMIN_PASSWORD,
-			Fullname: config.Envs.INITIAL_ADMIN_USERNAME,
 			Email:    fmt.Sprint(config.Envs.INITIAL_ADMIN_USERNAME, "@gmail.com"),
 			Role:     "admin",
 		})
@@ -33,7 +32,6 @@ func SeedUser(userRepo repository.IUserRepo) error {
 			UUID:     uuid.New(),
 			Username: config.Envs.INITIAL_USER_USERNAME,
 			Password: config.Envs.INITIAL_USER_PASSWORD,
-			Fullname: config.Envs.INITIAL_USER_USERNAME,
 			Email:    fmt.Sprint(config.Envs.INITIAL_USER_USERNAME, "@gmail.com"),
 			Role:     "user",
 		})

@@ -15,7 +15,6 @@ func GenerateJwtToken(user *model.User, secretKey string, expHours int, tokenId 
 	claims := jwt.MapClaims{
 		"sub":      user.UUID.String(),
 		"username": user.Username,
-		"fullname": user.Fullname,
 		"email":    user.Email,
 		"exp":      time.Now().Add(time.Hour * time.Duration(expHours)).Unix(),
 	}
