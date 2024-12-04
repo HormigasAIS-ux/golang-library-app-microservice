@@ -60,13 +60,13 @@ func ValidateJWT(tokenString string, secretKey string) (*dto.CurrentUser, error)
 
 	sub, _ := claims["sub"].(string)
 	username, _ := claims["username"].(string)
-	fullname, _ := claims["fullname"].(string)
+	role, _ := claims["role"].(string)
 	email, _ := claims["email"].(string)
 
 	return &dto.CurrentUser{
 		UUID:     sub,
 		Email:    email,
 		Username: username,
-		Fullname: fullname,
+		Role:     role,
 	}, nil
 }

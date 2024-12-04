@@ -334,7 +334,7 @@ func (s *AuthUcase) RefreshToken(payload dto.RefreshTokenReq) (*dto.RefreshToken
 
 func (s *AuthUcase) CheckToken(payload dto.CheckTokenReq) (*dto.CheckTokenRespData, error) {
 	claims, err := jwt_util.ValidateJWT(payload.AccessToken, config.Envs.JWT_SECRET_KEY)
-	if err != nil {
+	if err != nil || claims == nil {
 		logger.Errorf("error validating token: %v", err)
 		return nil, &error_utils.CustomErr{
 			HttpCode: 401,
@@ -347,7 +347,7 @@ func (s *AuthUcase) CheckToken(payload dto.CheckTokenReq) (*dto.CheckTokenRespDa
 	resp := &dto.CheckTokenRespData{
 		UUID:     claims.UUID,
 		Username: claims.Username,
-		Fullname: claims.Fullname,
+		Role:     claims.Role,
 		Email:    claims.Email,
 	}
 

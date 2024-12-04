@@ -42,7 +42,7 @@ func (h *AuthServiceHandler) CheckToken(ctx context.Context, req *auth.CheckToke
 		Uuid:     raw.UUID,
 		Username: raw.Username,
 		Email:    raw.Email,
-		Fullname: raw.Fullname,
+		Role:     raw.Role,
 	}
 
 	return resp, nil

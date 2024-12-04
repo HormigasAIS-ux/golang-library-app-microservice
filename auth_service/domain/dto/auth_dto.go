@@ -3,7 +3,7 @@ package dto
 type CurrentUser struct {
 	UUID     string `json:"uuid"`
 	Username string `json:"username"`
-	Fullname string `json:"fullname"`
+	Role     string `json:"role"`
 	Email    string `json:"email"`
 }
 
@@ -35,7 +35,7 @@ type CheckTokenReq struct {
 type CheckTokenRespData struct {
 	UUID     string `json:"uuid"`
 	Username string `json:"username"`
-	Fullname string `json:"fullname"`
+	Role     string `json:"role"`
 	Email    string `json:"email"`
 }
 
