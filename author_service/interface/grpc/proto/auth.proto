@@ -48,6 +48,7 @@ message CreateUserResp {
 }
 
 message UpdateUserReq {
+    string uuid = 9;
     string username = 1;
     string email = 2;
     string password = 3;
