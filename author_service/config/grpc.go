@@ -7,7 +7,7 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 )
 
-func NewAuthGrpcServiceConn() pb.AuthServiceClient {
+func NewAuthGrpcServiceClient() pb.AuthServiceClient {
 	conn, err := grpc.NewClient(Envs.AUTH_GRPC_SERVICE, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		logger.Fatalf("Failed to connect to auth grpc service: %v", err)

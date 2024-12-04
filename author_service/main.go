@@ -30,7 +30,7 @@ var logger = logging.MustGetLogger("main")
 func main() {
 	logger.Debugf("Envs: %v", helper.PrettyJson(config.Envs))
 	gormDB := config.NewPostgresqlDB()
-	authGrpcServiceConn := config.NewAuthGrpcServiceConn()
+	authGrpcServiceClient := config.NewAuthGrpcServiceClient()
 
 	// migrations
 	err := gormDB.AutoMigrate(
@@ -41,7 +41,7 @@ func main() {
 	}
 
 	// repositories
-	_ = repository.NewAuthRepo(authGrpcServiceConn)
+	_ = repository.NewAuthRepo(authGrpcServiceClient)
 	_ = repository.NewAuthorRepo(gormDB)
 
 	// ucases

@@ -17,7 +17,7 @@ import (
 	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
-var logger = logging.MustGetLogger("rest")
+var logger = logging.MustGetLogger("main")
 
 func SetupServer(commonDependencies interface_pkg.CommonDependency) {
 	router := gin.Default()
@@ -31,7 +31,7 @@ func SetupServer(commonDependencies interface_pkg.CommonDependency) {
 	)
 
 	// middlewares
-	authMiddleware := rest_middleware.AuthMiddleware(respWriter, commonDependencies.AuthorRepo)
+	authMiddleware := rest_middleware.AuthMiddleware(respWriter)
 	authMiddlewareAdminOnly := rest_middleware.AuthAdminOnlyMiddleware(respWriter)
 
 	// register routes
