@@ -52,32 +52,61 @@ func main() {
 		AuthUcase: authUcase,
 	}
 
-	// seed data
-	err = seeder_util.SeedUser(userRepo)
-	if err != nil {
-		logger.Fatalf("failed to seed user: %v", err)
-	}
-
 	args := os.Args
 	if len(args) == 1 { // run as a rest server
 		logger.Info("starting rest server...")
 		rest.SetupServer(dependencies)
 	} else if len(args) > 1 {
 		validArgVariables := []string{"server"}
+		validPreRunArgVariables := []string{"seed"}
 
 		// validate args
+		variables := validArgVariables
+		for _, preRunVariable := range validPreRunArgVariables {
+			variables = append(variables, preRunVariable)
+		}
+		// logger.Debugf("variables: %v", variables)
 		for _, arg := range args[1:] {
-			logger.Debugf("arg: %s", arg)
-			for _, validArgVariable := range validArgVariables {
+			valid := false
+			// logger.Debugf("arg: %s", arg)
+			for _, validArgVariable := range variables {
 				if strings.Contains(arg, fmt.Sprintf("--%s=", validArgVariable)) {
-					continue
+					// logger.Debug("contains")
+					valid = true
+					break
 				}
+			}
+
+			if !valid {
 				logger.Fatalf("invalid argument: %s", arg)
 			}
 		}
 
-		// process args
+		// group between pre variable and post variable
+		preArgs := []string{}
+		postArgs := []string{}
 		for _, arg := range args[1:] {
+			for _, preRunVariable := range validPreRunArgVariables {
+				if strings.Contains(arg, fmt.Sprintf("--%s=", preRunVariable)) {
+					preArgs = append(preArgs, arg)
+					// logger.Debugf("preArg: %s", arg)
+				}
+			}
+
+			for _, validArgVariable := range validArgVariables {
+				if strings.Contains(arg, fmt.Sprintf("--%s=", validArgVariable)) {
+					postArgs = append(postArgs, arg)
+					// logger.Debugf("postArg: %s", arg)
+				}
+			}
+		}
+
+		// process args
+		variables = preArgs
+		for _, postArg := range postArgs {
+			variables = append(variables, postArg)
+		}
+		for _, arg := range variables {
 			if strings.Contains(arg, fmt.Sprintf("--%s=", "server")) {
 				value := strings.Split(arg, "=")[1]
 
@@ -90,6 +119,17 @@ func main() {
 					grpc.SetupServer(dependencies)
 				default:
 					logger.Fatalf("invalid argument: %s", arg)
+				}
+
+			} else if strings.Contains(arg, fmt.Sprintf("--%s=", "seed")) {
+				value := strings.Split(arg, "=")[1]
+
+				switch value {
+				case "user":
+					err = seeder_util.SeedUser(userRepo)
+					if err != nil {
+						logger.Fatalf("failed to seed user: %v", err)
+					}
 				}
 			}
 		}
