@@ -8,6 +8,7 @@ service AuthService {
     rpc GetUserByUUID(GetUserByUUIDRequest) returns (GetUserByUUIDResponse);
     rpc CreateUser(CreateUserReq) returns (CreateUserResp);
     rpc UpdateUser(UpdateUserReq) returns (UpdateUserResp);
+    rpc DeleteUser(DeleteUserReq) returns (DeleteUserResp);
 }
 
 message CheckTokenRequest {
@@ -43,7 +44,6 @@ message CreateUserResp {
     string uuid = 1;
     string username = 2;
     string email = 3;
-    string password = 4;
     string role = 5;
 }
 
@@ -64,6 +64,16 @@ message UpdateUserResp {
     string uuid = 1;
     string username = 2;
     string email = 3;
-    string password = 4;
+    string role = 5;
+}
+
+message DeleteUserReq {
+    string uuid = 1;
+}
+
+message DeleteUserResp {
+    string uuid = 1;
+    string username = 2;
+    string email = 3;
     string role = 5;
 }
