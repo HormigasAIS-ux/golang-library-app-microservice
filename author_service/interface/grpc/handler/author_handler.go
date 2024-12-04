@@ -12,7 +12,7 @@ import (
 )
 
 type AuthorServiceHandler struct {
-	author_pb.UnimplementedAuthServiceServer
+	author_pb.UnimplementedAuthorServiceServer
 	authorService ucase.IAuthorUcase
 }
 
