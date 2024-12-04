@@ -23,6 +23,7 @@ type GetAuthorListRespDataItem struct {
 	LastName  string    `json:"last_name"`
 	BirthDate *string   `json:"birth_date"`
 	Bio       *string   `json:"bio"`
+	BookTotal int64     `json:"book_total"`
 }
 
 type GetAuthorListRespData struct {
@@ -115,4 +116,5 @@ type GetAuthorDetailRespData struct {
 	BirthDate *string   `json:"birth_date"`
 	Bio       *string   `json:"bio"`
 	Role      string    `json:"role"`
+	BookTotal int64     `json:"book_total"`
 }

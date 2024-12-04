@@ -3,13 +3,17 @@ package ucase
 import (
 	"author_service/domain/dto"
 	"author_service/domain/model"
-	pb "author_service/interface/grpc/genproto/auth"
+	auth_pb "author_service/interface/grpc/genproto/auth"
+	book_pb "author_service/interface/grpc/genproto/book"
 	"author_service/repository"
 	error_utils "author_service/utils/error"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
+	"github.com/op/go-logging"
 )
+
+var logger = logging.MustGetLogger("main")
 
 type AuthorUcase struct {
 	authorRepo repository.IAuthorRepo
@@ -43,7 +47,7 @@ func (u *AuthorUcase) CreateNewAuthor(
 	payload dto.CreateNewAuthorReq,
 ) (*dto.CreateNewAuthorRespData, error) {
 	// TODO: create new user through auth service
-	createdUser := pb.CreateUserResp{}
+	createdUser := auth_pb.CreateUserResp{}
 	parsedUserUUID, err := uuid.Parse(createdUser.Uuid)
 	if err != nil {
 		return nil, err
@@ -138,7 +142,7 @@ func (u *AuthorUcase) EditAuthor(
 		}
 	}
 
-	updateUserReq := pb.UpdateUserReq{Uuid: author.UserUUID.String()}
+	updateUserReq := auth_pb.UpdateUserReq{Uuid: author.UserUUID.String()}
 	if payload.Username != nil {
 		updateUserReq.Username = *payload.Username
 	} else {
@@ -164,7 +168,7 @@ func (u *AuthorUcase) EditAuthor(
 	}
 
 	// TODO: edit user through auth service
-	updatedUser := pb.UpdateUserResp{}
+	updatedUser := auth_pb.UpdateUserResp{}
 	if err != nil {
 		return nil, err
 	}
@@ -218,7 +222,7 @@ func (u *AuthorUcase) EditAuthor(
 
 func (u *AuthorUcase) DeleteAuthor(ctx *gin.Context, authorUUID string) (*dto.DeleteAuthorRespData, error) {
 	// TODO: delete user through auth service
-	deletedUser := pb.DeleteUserResp{}
+	deletedUser := auth_pb.DeleteUserResp{}
 
 	author, err := u.authorRepo.GetByUUID(authorUUID)
 	if err != nil {
@@ -292,7 +296,7 @@ func (u *AuthorUcase) GetAuthorDetail(ctx *gin.Context, authorUUID string) (*dto
 	}
 
 	// TODO: get user through auth service
-	user := pb.GetUserByUUIDResponse{}
+	user := auth_pb.GetUserByUUIDResponse{}
 
 	author, err := u.authorRepo.GetByUUID(authorUUID)
 	if err != nil {
@@ -306,6 +310,9 @@ func (u *AuthorUcase) GetAuthorDetail(ctx *gin.Context, authorUUID string) (*dto
 		return nil, err
 	}
 
+	// TODO: get book total by author uuid through book service
+	bookTotalResp := book_pb.GetBookTotalByAuthorUUIDResp{}
+
 	respData := &dto.GetAuthorDetailRespData{
 		UUID:      author.UUID,
 		CreatedAt: author.CreatedAt,
@@ -318,6 +325,7 @@ func (u *AuthorUcase) GetAuthorDetail(ctx *gin.Context, authorUUID string) (*dto
 		BirthDate: author.BirthDate,
 		Bio:       author.Bio,
 		Role:      user.Role,
+		BookTotal: bookTotalResp.BookTotal,
 	}
 
 	return respData, nil
@@ -327,13 +335,14 @@ func (u *AuthorUcase) GetList(
 	ctx *gin.Context, query dto.GetAuthorListReq,
 ) ([]dto.GetAuthorListRespDataItem, int64, error) {
 	// handle query by
+	queryBy := query.QueryBy
 	if query.QueryBy == "any" {
-		query.QueryBy = ""
+		queryBy = ""
 	}
 
 	data, err := u.authorRepo.GetList(ctx, dto.AuthorRepo_GetListParams{
 		Query:     query.Query,
-		QueryBy:   query.QueryBy,
+		QueryBy:   queryBy,
 		Page:      query.Page,
 		Limit:     query.Limit,
 		SortOrder: query.SortOrder,
@@ -351,8 +360,23 @@ func (u *AuthorUcase) GetList(
 		return nil, 0, err
 	}
 
+	// TODO: get bulk book total by author uuid through book service
+	bookTotalResp := book_pb.BulkGetBookTotalByAuthorUUIDsResp{}
+	bookTotalByAuthorUUID := make(map[string]int64)
+
+	if bookTotalResp.Data != nil {
+		for _, item := range bookTotalResp.Data {
+			bookTotalByAuthorUUID[item.AuthorUuid] = item.BookTotal
+		}
+	}
+
 	respItems := make([]dto.GetAuthorListRespDataItem, 0)
 	for _, v := range data {
+		bookTotal, ok := bookTotalByAuthorUUID[v.UUID.String()]
+		if !ok {
+			logger.Warningf("book total not found for author uuid: %s; set to 0", v.UUID.String())
+			bookTotal = 0
+		}
 		respItems = append(respItems, dto.GetAuthorListRespDataItem{
 			UUID:      v.UUID.String(),
 			CreatedAt: v.CreatedAt,
@@ -361,6 +385,7 @@ func (u *AuthorUcase) GetList(
 			LastName:  v.LastName,
 			BirthDate: v.BirthDate,
 			Bio:       v.Bio,
+			BookTotal: bookTotal,
 		})
 	}
 
