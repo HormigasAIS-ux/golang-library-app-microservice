@@ -42,7 +42,7 @@ func SetupServer(commonDependencies interface_pkg.CommonDependency) {
 		})
 	})
 
-	secureRouter := router.Group("/author")
+	secureRouter := router.Group("")
 	secureRouter.Use(authMiddleware)
 	// secured
 	{
