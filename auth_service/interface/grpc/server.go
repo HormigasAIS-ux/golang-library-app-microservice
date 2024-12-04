@@ -26,7 +26,8 @@ func SetupServer(commonDependencies interface_pkg.CommonDependency) {
 	grpcServer := grpc.NewServer()
 
 	// register service handler
-	authServiceHandler := handler.NewAuthServiceHandler(commonDependencies.AuthUcase)
+	logger.Debugf("ucase: %v", commonDependencies.AuthUcase)
+	authServiceHandler := handler.NewAuthServiceHandler(commonDependencies.AuthUcase, commonDependencies.UserUcase)
 	auth.RegisterAuthServiceServer(grpcServer, authServiceHandler)
 
 	// Start the server

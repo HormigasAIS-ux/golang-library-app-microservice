@@ -52,9 +52,11 @@ func main() {
 
 	// ucases
 	authUcase := ucase.NewAuthUcase(userRepo, refreshTokenRepo, authorRepo)
+	userUcase := ucase.NewUserUcase(userRepo)
 
 	dependencies := interface_pkg.CommonDependency{
 		AuthUcase: authUcase,
+		UserUcase: userUcase,
 	}
 
 	args := os.Args

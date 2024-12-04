@@ -6,4 +6,5 @@ import (
 
 type CommonDependency struct {
 	AuthUcase ucase.IAuthUcase
+	UserUcase ucase.IUserUcase
 }

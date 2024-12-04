@@ -47,23 +47,27 @@ func SeedUser(userRepo repository.IUserRepo, authorRepo repository.IAuthorRepo) 
 
 		existing, _ := userRepo.GetByUsername(user.Username)
 		if existing != nil {
-			logger.Infof("user already exists: %s", user.Username)
-			continue
+			logger.Warningf("user already exists: %s", user.Username)
 		}
 
 		err := userRepo.Create(&user)
 		if err != nil {
 			logger.Warningf("failed to seed user: %s", user.Username)
-			continue
 		}
 
 		logger.Infof("user seeded: %s", user.Username)
 
 		// create author through author service
+		userUUID := user.UUID.String()
+		if existing != nil {
+			logger.Debugf("user exist")
+			userUUID = existing.UUID.String()
+		}
+		logger.Debugf("userUUID: %s", userUUID)
 		createAuthorResp, grpcCode, err := authorRepo.RpcCreateAuthor(
 			context.Background(),
 			&author_pb.CreateAuthorReq{
-				UserUuid:  user.UUID.String(),
+				UserUuid:  userUUID,
 				FirstName: user.Username,
 			},
 		)
@@ -79,6 +83,7 @@ func SeedUser(userRepo repository.IUserRepo, authorRepo repository.IAuthorRepo) 
 		}
 
 		logger.Infof("author seeded: %s %s", createAuthorResp.FirstName, createAuthorResp.LastName)
+
 	}
 
 	return nil

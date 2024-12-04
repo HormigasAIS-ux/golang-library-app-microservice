@@ -17,8 +17,8 @@ type AuthServiceHandler struct {
 	userUcase ucase.IUserUcase
 }
 
-func NewAuthServiceHandler(authUcase ucase.IAuthUcase) *AuthServiceHandler {
-	return &AuthServiceHandler{authUcase: authUcase}
+func NewAuthServiceHandler(authUcase ucase.IAuthUcase, userUcase ucase.IUserUcase) *AuthServiceHandler {
+	return &AuthServiceHandler{authUcase: authUcase, userUcase: userUcase}
 }
 
 func (h *AuthServiceHandler) CheckToken(ctx context.Context, req *auth.CheckTokenRequest) (*auth.CheckTokenResponse, error) {

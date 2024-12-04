@@ -19,7 +19,10 @@ import (
 var logger = logging.MustGetLogger("rest")
 
 func SetupServer(commonDependencies interface_pkg.CommonDependency) {
+	// logger.Debug(1)
 	router := gin.Default()
+
+	// logger.Debug(2)
 
 	responseWriter := http_response.NewHttpResponseWriter()
 
@@ -42,5 +45,6 @@ func SetupServer(commonDependencies interface_pkg.CommonDependency) {
 	// swagger
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
 
+	// logger.Debug(3)
 	router.Run(fmt.Sprintf("%s:%d", config.Envs.HOST, config.Envs.PORT))
 }
