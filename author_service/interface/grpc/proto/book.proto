@@ -3,7 +3,7 @@ syntax = "proto3";
 package book_service;
 option go_package = "book_service/interface/grpc/genproto/book";
 
-service AuthService {
+service BookService {
     rpc GetBookTotalByAuthorUUID(GetBookTotalByAuthorUUIDReq) returns (GetBookTotalByAuthorUUIDResp);
     rpc BulkGetBookTotalByAuthorUUIDs(BulkGetBookTotalByAuthorUUIDsReq) returns (BulkGetBookTotalByAuthorUUIDsResp);
 }

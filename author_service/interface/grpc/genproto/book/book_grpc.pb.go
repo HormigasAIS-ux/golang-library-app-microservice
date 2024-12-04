@@ -19,139 +19,139 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	AuthService_GetBookTotalByAuthorUUID_FullMethodName      = "/book_service.AuthService/GetBookTotalByAuthorUUID"
-	AuthService_BulkGetBookTotalByAuthorUUIDs_FullMethodName = "/book_service.AuthService/BulkGetBookTotalByAuthorUUIDs"
+	BookService_GetBookTotalByAuthorUUID_FullMethodName      = "/book_service.BookService/GetBookTotalByAuthorUUID"
+	BookService_BulkGetBookTotalByAuthorUUIDs_FullMethodName = "/book_service.BookService/BulkGetBookTotalByAuthorUUIDs"
 )
 
-// AuthServiceClient is the client API for AuthService service.
+// BookServiceClient is the client API for BookService service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
-type AuthServiceClient interface {
+type BookServiceClient interface {
 	GetBookTotalByAuthorUUID(ctx context.Context, in *GetBookTotalByAuthorUUIDReq, opts ...grpc.CallOption) (*GetBookTotalByAuthorUUIDResp, error)
 	BulkGetBookTotalByAuthorUUIDs(ctx context.Context, in *BulkGetBookTotalByAuthorUUIDsReq, opts ...grpc.CallOption) (*BulkGetBookTotalByAuthorUUIDsResp, error)
 }
 
-type authServiceClient struct {
+type bookServiceClient struct {
 	cc grpc.ClientConnInterface
 }
 
-func NewAuthServiceClient(cc grpc.ClientConnInterface) AuthServiceClient {
-	return &authServiceClient{cc}
+func NewBookServiceClient(cc grpc.ClientConnInterface) BookServiceClient {
+	return &bookServiceClient{cc}
 }
 
-func (c *authServiceClient) GetBookTotalByAuthorUUID(ctx context.Context, in *GetBookTotalByAuthorUUIDReq, opts ...grpc.CallOption) (*GetBookTotalByAuthorUUIDResp, error) {
+func (c *bookServiceClient) GetBookTotalByAuthorUUID(ctx context.Context, in *GetBookTotalByAuthorUUIDReq, opts ...grpc.CallOption) (*GetBookTotalByAuthorUUIDResp, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(GetBookTotalByAuthorUUIDResp)
-	err := c.cc.Invoke(ctx, AuthService_GetBookTotalByAuthorUUID_FullMethodName, in, out, cOpts...)
+	err := c.cc.Invoke(ctx, BookService_GetBookTotalByAuthorUUID_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *authServiceClient) BulkGetBookTotalByAuthorUUIDs(ctx context.Context, in *BulkGetBookTotalByAuthorUUIDsReq, opts ...grpc.CallOption) (*BulkGetBookTotalByAuthorUUIDsResp, error) {
+func (c *bookServiceClient) BulkGetBookTotalByAuthorUUIDs(ctx context.Context, in *BulkGetBookTotalByAuthorUUIDsReq, opts ...grpc.CallOption) (*BulkGetBookTotalByAuthorUUIDsResp, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(BulkGetBookTotalByAuthorUUIDsResp)
-	err := c.cc.Invoke(ctx, AuthService_BulkGetBookTotalByAuthorUUIDs_FullMethodName, in, out, cOpts...)
+	err := c.cc.Invoke(ctx, BookService_BulkGetBookTotalByAuthorUUIDs_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-// AuthServiceServer is the server API for AuthService service.
-// All implementations must embed UnimplementedAuthServiceServer
+// BookServiceServer is the server API for BookService service.
+// All implementations must embed UnimplementedBookServiceServer
 // for forward compatibility.
-type AuthServiceServer interface {
+type BookServiceServer interface {
 	GetBookTotalByAuthorUUID(context.Context, *GetBookTotalByAuthorUUIDReq) (*GetBookTotalByAuthorUUIDResp, error)
 	BulkGetBookTotalByAuthorUUIDs(context.Context, *BulkGetBookTotalByAuthorUUIDsReq) (*BulkGetBookTotalByAuthorUUIDsResp, error)
-	mustEmbedUnimplementedAuthServiceServer()
+	mustEmbedUnimplementedBookServiceServer()
 }
 
-// UnimplementedAuthServiceServer must be embedded to have
+// UnimplementedBookServiceServer must be embedded to have
 // forward compatible implementations.
 //
 // NOTE: this should be embedded by value instead of pointer to avoid a nil
 // pointer dereference when methods are called.
-type UnimplementedAuthServiceServer struct{}
+type UnimplementedBookServiceServer struct{}
 
-func (UnimplementedAuthServiceServer) GetBookTotalByAuthorUUID(context.Context, *GetBookTotalByAuthorUUIDReq) (*GetBookTotalByAuthorUUIDResp, error) {
+func (UnimplementedBookServiceServer) GetBookTotalByAuthorUUID(context.Context, *GetBookTotalByAuthorUUIDReq) (*GetBookTotalByAuthorUUIDResp, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetBookTotalByAuthorUUID not implemented")
 }
-func (UnimplementedAuthServiceServer) BulkGetBookTotalByAuthorUUIDs(context.Context, *BulkGetBookTotalByAuthorUUIDsReq) (*BulkGetBookTotalByAuthorUUIDsResp, error) {
+func (UnimplementedBookServiceServer) BulkGetBookTotalByAuthorUUIDs(context.Context, *BulkGetBookTotalByAuthorUUIDsReq) (*BulkGetBookTotalByAuthorUUIDsResp, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method BulkGetBookTotalByAuthorUUIDs not implemented")
 }
-func (UnimplementedAuthServiceServer) mustEmbedUnimplementedAuthServiceServer() {}
-func (UnimplementedAuthServiceServer) testEmbeddedByValue()                     {}
+func (UnimplementedBookServiceServer) mustEmbedUnimplementedBookServiceServer() {}
+func (UnimplementedBookServiceServer) testEmbeddedByValue()                     {}
 
-// UnsafeAuthServiceServer may be embedded to opt out of forward compatibility for this service.
-// Use of this interface is not recommended, as added methods to AuthServiceServer will
+// UnsafeBookServiceServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to BookServiceServer will
 // result in compilation errors.
-type UnsafeAuthServiceServer interface {
-	mustEmbedUnimplementedAuthServiceServer()
+type UnsafeBookServiceServer interface {
+	mustEmbedUnimplementedBookServiceServer()
 }
 
-func RegisterAuthServiceServer(s grpc.ServiceRegistrar, srv AuthServiceServer) {
-	// If the following call pancis, it indicates UnimplementedAuthServiceServer was
+func RegisterBookServiceServer(s grpc.ServiceRegistrar, srv BookServiceServer) {
+	// If the following call pancis, it indicates UnimplementedBookServiceServer was
 	// embedded by pointer and is nil.  This will cause panics if an
 	// unimplemented method is ever invoked, so we test this at initialization
 	// time to prevent it from happening at runtime later due to I/O.
 	if t, ok := srv.(interface{ testEmbeddedByValue() }); ok {
 		t.testEmbeddedByValue()
 	}
-	s.RegisterService(&AuthService_ServiceDesc, srv)
+	s.RegisterService(&BookService_ServiceDesc, srv)
 }
 
-func _AuthService_GetBookTotalByAuthorUUID_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _BookService_GetBookTotalByAuthorUUID_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(GetBookTotalByAuthorUUIDReq)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(AuthServiceServer).GetBookTotalByAuthorUUID(ctx, in)
+		return srv.(BookServiceServer).GetBookTotalByAuthorUUID(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: AuthService_GetBookTotalByAuthorUUID_FullMethodName,
+		FullMethod: BookService_GetBookTotalByAuthorUUID_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AuthServiceServer).GetBookTotalByAuthorUUID(ctx, req.(*GetBookTotalByAuthorUUIDReq))
+		return srv.(BookServiceServer).GetBookTotalByAuthorUUID(ctx, req.(*GetBookTotalByAuthorUUIDReq))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _AuthService_BulkGetBookTotalByAuthorUUIDs_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _BookService_BulkGetBookTotalByAuthorUUIDs_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(BulkGetBookTotalByAuthorUUIDsReq)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(AuthServiceServer).BulkGetBookTotalByAuthorUUIDs(ctx, in)
+		return srv.(BookServiceServer).BulkGetBookTotalByAuthorUUIDs(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: AuthService_BulkGetBookTotalByAuthorUUIDs_FullMethodName,
+		FullMethod: BookService_BulkGetBookTotalByAuthorUUIDs_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AuthServiceServer).BulkGetBookTotalByAuthorUUIDs(ctx, req.(*BulkGetBookTotalByAuthorUUIDsReq))
+		return srv.(BookServiceServer).BulkGetBookTotalByAuthorUUIDs(ctx, req.(*BulkGetBookTotalByAuthorUUIDsReq))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-// AuthService_ServiceDesc is the grpc.ServiceDesc for AuthService service.
+// BookService_ServiceDesc is the grpc.ServiceDesc for BookService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
-var AuthService_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "book_service.AuthService",
-	HandlerType: (*AuthServiceServer)(nil),
+var BookService_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "book_service.BookService",
+	HandlerType: (*BookServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
 			MethodName: "GetBookTotalByAuthorUUID",
-			Handler:    _AuthService_GetBookTotalByAuthorUUID_Handler,
+			Handler:    _BookService_GetBookTotalByAuthorUUID_Handler,
 		},
 		{
 			MethodName: "BulkGetBookTotalByAuthorUUIDs",
-			Handler:    _AuthService_BulkGetBookTotalByAuthorUUIDs_Handler,
+			Handler:    _BookService_BulkGetBookTotalByAuthorUUIDs_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
