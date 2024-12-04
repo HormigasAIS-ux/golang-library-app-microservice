@@ -345,16 +345,11 @@ func (s *AuthUcase) CheckToken(payload dto.CheckTokenReq) (*dto.CheckTokenRespDa
 		}
 	}
 
-	sub, _ := claims["sub"].(string)
-	username, _ := claims["username"].(string)
-	fullname, _ := claims["fullname"].(string)
-	email, _ := claims["email"].(string)
-
 	resp := &dto.CheckTokenRespData{
-		UUID:     sub,
-		Username: username,
-		Fullname: fullname,
-		Email:    email,
+		UUID:     claims.UUID,
+		Username: claims.Username,
+		Fullname: claims.Fullname,
+		Email:    claims.Email,
 	}
 
 	return resp, nil

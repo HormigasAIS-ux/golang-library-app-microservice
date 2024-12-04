@@ -1,6 +1,7 @@
 package jwt_util
 
 import (
+	"auth_service/domain/dto"
 	"auth_service/domain/model"
 	"fmt"
 	"time"
@@ -32,7 +33,7 @@ func GenerateJwtToken(user *model.User, secretKey string, expHours int, tokenId 
 	return accessToken, nil
 }
 
-func ValidateJWT(tokenString string, secretKey string) (jwt.MapClaims, error) {
+func ValidateJWT(tokenString string, secretKey string) (*dto.CurrentUser, error) {
 	var JWT_SIGNATURE_KEY = []byte(secretKey)
 
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
@@ -53,6 +54,20 @@ func ValidateJWT(tokenString string, secretKey string) (jwt.MapClaims, error) {
 		return nil, err
 	}
 
-	claims := token.Claims.(jwt.MapClaims)
-	return claims, nil
+	claims, ok := token.Claims.(jwt.MapClaims)
+	if !ok {
+		return nil, err
+	}
+
+	sub, _ := claims["sub"].(string)
+	username, _ := claims["username"].(string)
+	fullname, _ := claims["fullname"].(string)
+	email, _ := claims["email"].(string)
+
+	return &dto.CurrentUser{
+		UUID:     sub,
+		Email:    email,
+		Username: username,
+		Fullname: fullname,
+	}, nil
 }
