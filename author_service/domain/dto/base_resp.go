@@ -7,7 +7,7 @@ import (
 type BaseJSONResp struct {
 	Code    int         `json:"code"`
 	Message string      `json:"message"`
-	Detail  string      `json:"detail"`
+	Detail  interface{} `json:"detail"`
 	Data    interface{} `json:"data"`
 }
 
@@ -35,7 +35,7 @@ func (s *BasePaginatedData) Set(
 		s.CurrentPage = page
 	}
 
-	if page != 0 && page != 0 && count > 0 {
+	if page != 0 && count > 0 {
 		s.TotalPage = int64((count + int64(limit) - 1) / int64(limit))
 	}
 
