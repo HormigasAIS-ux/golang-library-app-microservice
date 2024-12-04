@@ -4,6 +4,7 @@ import (
 	"author_service/domain/dto"
 	ucase "author_service/usecase"
 	"author_service/utils/http_response"
+	"context"
 
 	"github.com/gin-gonic/gin"
 )
@@ -48,7 +49,7 @@ func (h *AuthorHandler) CreateNewAuthor(ctx *gin.Context) {
 		return
 	}
 
-	resp, err := h.authorUcase.CreateNewAuthor(ctx, payload)
+	resp, err := h.authorUcase.CreateNewAuthor(context.TODO(), ctx, payload)
 	if err != nil {
 		h.respWriter.HTTPCustomErr(
 			ctx, err,

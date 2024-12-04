@@ -41,6 +41,7 @@ type AuthorRepo_GetListParams struct {
 }
 
 type CreateNewAuthorReq struct {
+	UserUUID  *string `json:"user_uuid"` // required for create new author by auth service, optional for client
 	Email     string  `json:"email" binding:"required,email"`
 	Username  string  `json:"username" binding:"required"`
 	Password  string  `json:"password" binding:"required"`

@@ -7,6 +7,7 @@ import (
 	book_pb "author_service/interface/grpc/genproto/book"
 	"author_service/repository"
 	error_utils "author_service/utils/error"
+	"context"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
@@ -21,7 +22,8 @@ type AuthorUcase struct {
 
 type IAuthorUcase interface {
 	CreateNewAuthor(
-		ctx *gin.Context,
+		ctx context.Context,
+		ginCtx *gin.Context,
 		payload dto.CreateNewAuthorReq,
 	) (*dto.CreateNewAuthorRespData, error) // admin only
 	EditAuthor(
@@ -43,14 +45,38 @@ func NewAuthorUcase(authorRepo repository.IAuthorRepo) IAuthorUcase {
 }
 
 func (u *AuthorUcase) CreateNewAuthor(
-	ctx *gin.Context,
+	ctx context.Context,
+	ginCtx *gin.Context,
 	payload dto.CreateNewAuthorReq,
 ) (*dto.CreateNewAuthorRespData, error) {
-	// TODO: create new user through auth service
-	createdUser := auth_pb.CreateUserResp{}
-	parsedUserUUID, err := uuid.Parse(createdUser.Uuid)
-	if err != nil {
-		return nil, err
+	var parsedUserUUID uuid.UUID
+	var userEmail string
+	var userUsername string
+	var userRole string
+	var err error
+
+	if payload.UserUUID != nil { // user uuid provided for auth service grpc call
+		// TODO: get user from auth service
+		getUserResp := auth_pb.GetUserByUUIDResponse{}
+		parsedUserUUID, err = uuid.Parse(getUserResp.Uuid)
+		if err != nil {
+			return nil, err
+		}
+		userEmail = getUserResp.Email
+		userUsername = getUserResp.Username
+		userRole = getUserResp.Role
+	} else { // user uuid not provided for client call
+		// TODO: create user through auth service
+		createdUser := auth_pb.CreateUserResp{}
+		// TODO: handle username or email already exist error
+		parsedUserUUID, err = uuid.Parse(createdUser.Uuid)
+		if err != nil {
+			return nil, err
+		}
+
+		userEmail = createdUser.Email
+		userUsername = createdUser.Username
+		userRole = createdUser.Role
 	}
 
 	newAuthor := &model.Author{
@@ -87,9 +113,9 @@ func (u *AuthorUcase) CreateNewAuthor(
 		LastName:  newAuthor.LastName,
 		BirthDate: newAuthor.BirthDate,
 		Bio:       newAuthor.Bio,
-		Email:     payload.Email,
-		Username:  payload.Username,
-		Role:      createdUser.Role,
+		Email:     userEmail,
+		Username:  userUsername,
+		Role:      userRole,
 	}
 
 	return respData, nil
