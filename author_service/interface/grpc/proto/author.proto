@@ -5,7 +5,7 @@ option go_package = "author_service/interface/grpc/genproto/author";
 
 service AuthorService {
     rpc CreateAuthor(CreateAuthorReq) returns (CreateAuthorResp);
-    rpc GetAuthorByUserUUID(GetAuthorByUserUUIDReq) (GetAuthorByUserUUIDResp)
+    rpc GetAuthorByUserUUID(GetAuthorByUserUUIDReq) returns (GetAuthorByUserUUIDResp);
 
 }
 
