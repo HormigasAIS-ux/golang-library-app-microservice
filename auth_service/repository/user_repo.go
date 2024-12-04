@@ -36,9 +36,9 @@ func (repo *UserRepo) GetByUUID(uuid string) (*model.User, error) {
 	var user model.User
 	if err := repo.db.First(&user, "uuid = ?", uuid).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
-			return nil, errors.New("user not found")
+			return nil, errors.New("not found")
 		}
-		return nil, errors.New("failed to get user")
+		return nil, errors.New("failed to get: " + err.Error())
 	}
 	return &user, nil
 }
@@ -72,5 +72,11 @@ func (repo *UserRepo) Update(user *model.User) error {
 
 func (repo *UserRepo) Delete(id string) error {
 	err := repo.db.Delete(&model.User{}, "id = ?", id).Error
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return errors.New("not found")
+		}
+		return errors.New("failed to delete: " + err.Error())
+	}
 	return err
 }
