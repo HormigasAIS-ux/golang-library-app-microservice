@@ -16,12 +16,20 @@ services:
       - my_network
     env_file:
       - .env
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "${POSTGRES_USER}", "-d", "postgres"]
+      interval: 10s
+      retries: 5
+      start_period: 30s
+      timeout: 5s
+    restart: always
 
   syn_auth_service_rest:
+    image: ${AUTH_SERVICE_IMAGE}
     build:
       context: ./auth_service
     container_name: syn_auth_service_rest
-    command: ["./auth_service", "--server=rest", "--seed=user"]
+    command: ["./auth_service", "--server=rest"]
     ports:
       - "8001:8001"
     networks:
@@ -29,9 +37,13 @@ services:
     env_file:
       - ./auth_service/.env
     depends_on:
-      - backend_syn_db
+      backend_syn_db:
+        condition: service_healthy
+    restart: always
+
 
   syn_auth_service_grpc:
+    image: ${AUTH_SERVICE_IMAGE}
     build:
       context: ./auth_service
     container_name: syn_auth_service_grpc
@@ -43,9 +55,28 @@ services:
     env_file:
       - ./auth_service/.env
     depends_on:
+      backend_syn_db:
+        condition: service_healthy
+    restart: always
+
+
+  syn_auth_service_seed_user:
+    image: ${AUTH_SERVICE_IMAGE}
+    build:
+      context: ./auth_service
+    container_name: syn_auth_service_seed_user
+    command: ["./auth_service", "--seed=user"]
+    networks:
+      - my_network
+    env_file:
+      - ./auth_service/.env
+    depends_on:
       - backend_syn_db
+      - syn_auth_service_grpc
+      - syn_author_service_grpc
 
   syn_author_service_rest:
+    image: ${AUTHOR_SERVICE_IMAGE}
     build:
       context: ./author_service
     container_name: syn_author_service_rest
@@ -57,9 +88,13 @@ services:
     env_file:
       - ./author_service/.env
     depends_on:
-      - backend_syn_db
+      backend_syn_db:
+        condition: service_healthy
+    restart: always
+
 
   syn_author_service_grpc:
+    image: ${AUTHOR_SERVICE_IMAGE}
     build:
       context: ./author_service
     container_name: syn_author_service_grpc
@@ -71,7 +106,10 @@ services:
     env_file:
       - ./author_service/.env
     depends_on:
-      - backend_syn_db
+      backend_syn_db:
+        condition: service_healthy
+    restart: always
+
 
 volumes:
   postgres_data:

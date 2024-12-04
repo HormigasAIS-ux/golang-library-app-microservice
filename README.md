@@ -37,10 +37,10 @@ This project consists of four services: `auth_service`, `book_service`, `categor
 
 3. **Use Local Image (Optional)**
 
-   - If you want to use a local image instead of pulling from a registry, you can use the [`./docker-compose-manual.yaml`](./docker-compose-manual.yaml) file. To do this, run the following:
+   - If you want to use a local image instead of pulling from a registry, you can leave empty the `*_SERVICE_IMAGE` in the `.env` file (refer to [`./env.example`](./env.example)) and run docker compose with `--build` flag:
 
      ```bash
-     docker-compose -f docker-compose-manual.yaml up -d
+     docker-compose up -d --build
      ```
 
    - This will run the services using local images.

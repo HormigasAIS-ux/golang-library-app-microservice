@@ -7,6 +7,11 @@
     "paths": {
         "/authors": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "tags": [
                     "Authors"
                 ],
@@ -80,6 +85,11 @@
                 }
             },
             "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "tags": [
                     "Authors"
                 ],
@@ -119,6 +129,11 @@
         },
         "/authors/me": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "tags": [
                     "Authors"
                 ],
@@ -145,6 +160,11 @@
                 }
             },
             "patch": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "tags": [
                     "Authors"
                 ],
@@ -184,6 +204,11 @@
         },
         "/authors/{author_uuid}": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "tags": [
                     "Authors"
                 ],
@@ -210,6 +235,11 @@
                 }
             },
             "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "tags": [
                     "Authors"
                 ],
@@ -236,6 +266,11 @@
                 }
             },
             "patch": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "tags": [
                     "Authors"
                 ],
@@ -282,9 +317,7 @@
                     "type": "integer"
                 },
                 "data": {},
-                "detail": {
-                    "type": "string"
-                },
+                "detail": {},
                 "message": {
                     "type": "string"
                 }
@@ -324,6 +357,10 @@
                         "admin",
                         "user"
                     ]
+                },
+                "user_uuid": {
+                    "description": "required for create new author by auth service, optional for client",
+                    "type": "string"
                 },
                 "username": {
                     "type": "string"
@@ -486,6 +523,9 @@
                 "birth_date": {
                     "type": "string"
                 },
+                "book_total": {
+                    "type": "integer"
+                },
                 "created_at": {
                     "type": "string"
                 },
@@ -543,6 +583,9 @@
                 },
                 "birth_date": {
                     "type": "string"
+                },
+                "book_total": {
+                    "type": "integer"
                 },
                 "created_at": {
                     "type": "string"

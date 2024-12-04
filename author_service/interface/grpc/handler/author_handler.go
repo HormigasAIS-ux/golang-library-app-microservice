@@ -5,53 +5,64 @@ import (
 	author_pb "author_service/interface/grpc/genproto/author"
 	ucase "author_service/usecase"
 	error_utils "author_service/utils/error"
+	"context"
 
-	"github.com/gin-gonic/gin"
+	"github.com/op/go-logging"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
 
 type AuthorServiceHandler struct {
 	author_pb.UnimplementedAuthorServiceServer
-	authorService ucase.IAuthorUcase
+	authorUcase ucase.IAuthorUcase
 }
 
-func NewAuthorServiceHandler(authService ucase.IAuthorUcase) *AuthorServiceHandler {
-	return &AuthorServiceHandler{authorService: authService}
+var logger = logging.MustGetLogger("main")
+
+func NewAuthorServiceHandler(authorUcase ucase.IAuthorUcase) *AuthorServiceHandler {
+	handler := &AuthorServiceHandler{authorUcase: authorUcase}
+	// logger.Debugf("ucase: %v", authorUcase)
+	return handler
 }
 
 func (r *AuthorServiceHandler) CreateAuthor(
-	ctx *gin.Context,
-	payload *author_pb.CreateAuthorReq,
+	ctx context.Context,
+	in *author_pb.CreateAuthorReq,
 ) (*author_pb.CreateAuthorResp, error) {
+	logger.Debugf("incoming request: %v", in)
 	// payload validation
 	payloadDto := dto.CreateNewAuthorReq{
-		LastName: payload.LastName,
+		LastName: in.LastName,
 	}
-	if payload.UserUuid == "" {
+	if in.UserUuid == "" {
 		return nil, status.Error(codes.InvalidArgument, "user uuid is required")
+	} else {
+		payloadDto.UserUUID = &in.UserUuid
 	}
 
-	if payload.FirstName == "" {
+	if in.FirstName == "" {
 		return nil, status.Error(codes.InvalidArgument, "first name is required")
 	} else {
-		payloadDto.FirstName = payload.FirstName
+		payloadDto.FirstName = in.FirstName
 	}
 
-	if payload.BirthDate == "" {
+	if in.BirthDate == "" {
 		payloadDto.BirthDate = nil
 	} else {
-		payloadDto.BirthDate = &payload.BirthDate
+		payloadDto.BirthDate = &in.BirthDate
 	}
 
-	if payload.Bio == "" {
+	if in.Bio == "" {
 		payloadDto.Bio = nil
 	} else {
-		payloadDto.Bio = &payload.Bio
+		payloadDto.Bio = &in.Bio
 	}
 
-	raw, err := r.authorService.CreateNewAuthor(ctx, payloadDto)
+	logger.Debugf("calling create new author")
+	raw, err := r.authorUcase.CreateNewAuthor(ctx, payloadDto)
+	logger.Debugf("create new author done")
 	if err != nil {
+		logger.Errorf("error creating author: %v", err)
 		customErr, ok := err.(*error_utils.CustomErr)
 		if ok {
 			return nil, status.Errorf(customErr.GrpcCode, customErr.Error())

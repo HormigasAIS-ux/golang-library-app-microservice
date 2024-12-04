@@ -7,6 +7,7 @@ import (
 	"author_service/interface/grpc"
 	"author_service/interface/rest"
 	"author_service/repository"
+	ucase "author_service/usecase"
 	"author_service/utils/helper"
 	"fmt"
 	"os"
@@ -41,11 +42,14 @@ func main() {
 	}
 
 	// repositories
-	_ = repository.NewAuthRepo(authGrpcServiceClient)
-	_ = repository.NewAuthorRepo(gormDB)
+	authRepo := repository.NewAuthRepo(authGrpcServiceClient)
+	authorRepo := repository.NewAuthorRepo(gormDB)
 
 	// ucases
-	dependencies := interface_pkg.CommonDependency{}
+	authorUcase := ucase.NewAuthorUcase(authorRepo, authRepo)
+	dependencies := interface_pkg.CommonDependency{
+		AuthorUcase: authorUcase,
+	}
 
 	args := os.Args
 	if len(args) == 1 { // run as a rest server

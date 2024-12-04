@@ -17,6 +17,11 @@ const docTemplate = `{
     "paths": {
         "/authors": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "tags": [
                     "Authors"
                 ],
@@ -90,6 +95,11 @@ const docTemplate = `{
                 }
             },
             "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "tags": [
                     "Authors"
                 ],
@@ -129,6 +139,11 @@ const docTemplate = `{
         },
         "/authors/me": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "tags": [
                     "Authors"
                 ],
@@ -155,6 +170,11 @@ const docTemplate = `{
                 }
             },
             "patch": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "tags": [
                     "Authors"
                 ],
@@ -194,6 +214,11 @@ const docTemplate = `{
         },
         "/authors/{author_uuid}": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "tags": [
                     "Authors"
                 ],
@@ -220,6 +245,11 @@ const docTemplate = `{
                 }
             },
             "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "tags": [
                     "Authors"
                 ],
@@ -246,6 +276,11 @@ const docTemplate = `{
                 }
             },
             "patch": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "tags": [
                     "Authors"
                 ],
@@ -292,9 +327,7 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "data": {},
-                "detail": {
-                    "type": "string"
-                },
+                "detail": {},
                 "message": {
                     "type": "string"
                 }
@@ -334,6 +367,10 @@ const docTemplate = `{
                         "admin",
                         "user"
                     ]
+                },
+                "user_uuid": {
+                    "description": "required for create new author by auth service, optional for client",
+                    "type": "string"
                 },
                 "username": {
                     "type": "string"
@@ -496,6 +533,9 @@ const docTemplate = `{
                 "birth_date": {
                     "type": "string"
                 },
+                "book_total": {
+                    "type": "integer"
+                },
                 "created_at": {
                     "type": "string"
                 },
@@ -553,6 +593,9 @@ const docTemplate = `{
                 },
                 "birth_date": {
                     "type": "string"
+                },
+                "book_total": {
+                    "type": "integer"
                 },
                 "created_at": {
                     "type": "string"

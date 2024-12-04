@@ -4,8 +4,7 @@ definitions:
       code:
         type: integer
       data: {}
-      detail:
-        type: string
+      detail: {}
       message:
         type: string
     type: object
@@ -27,6 +26,10 @@ definitions:
         enum:
         - admin
         - user
+        type: string
+      user_uuid:
+        description: required for create new author by auth service, optional for
+          client
         type: string
       username:
         type: string
@@ -140,6 +143,8 @@ definitions:
         type: string
       birth_date:
         type: string
+      book_total:
+        type: integer
       created_at:
         type: string
       email:
@@ -178,6 +183,8 @@ definitions:
         type: string
       birth_date:
         type: string
+      book_total:
+        type: integer
       created_at:
         type: string
       first_name:
@@ -237,6 +244,8 @@ paths:
                 data:
                   $ref: '#/definitions/dto.GetAuthorListRespData'
               type: object
+      security:
+      - BearerAuth: []
       summary: Get Author List
       tags:
       - Authors
@@ -258,6 +267,8 @@ paths:
                 data:
                   $ref: '#/definitions/dto.CreateNewAuthorRespData'
               type: object
+      security:
+      - BearerAuth: []
       summary: Create new author
       tags:
       - Authors
@@ -273,6 +284,8 @@ paths:
                 data:
                   $ref: '#/definitions/dto.DeleteAuthorRespData'
               type: object
+      security:
+      - BearerAuth: []
       summary: Delete author
       tags:
       - Authors
@@ -287,6 +300,8 @@ paths:
                 data:
                   $ref: '#/definitions/dto.GetAuthorDetailRespData'
               type: object
+      security:
+      - BearerAuth: []
       summary: Get author detail
       tags:
       - Authors
@@ -308,6 +323,8 @@ paths:
                 data:
                   $ref: '#/definitions/dto.EditAuthorRespData'
               type: object
+      security:
+      - BearerAuth: []
       summary: Edit author
       tags:
       - Authors
@@ -323,6 +340,8 @@ paths:
                 data:
                   $ref: '#/definitions/dto.GetAuthorDetailRespData'
               type: object
+      security:
+      - BearerAuth: []
       summary: Get my author profile detail
       tags:
       - Authors
@@ -344,6 +363,8 @@ paths:
                 data:
                   $ref: '#/definitions/dto.EditAuthorRespData'
               type: object
+      security:
+      - BearerAuth: []
       summary: Edit my author profile
       tags:
       - Authors

@@ -38,6 +38,7 @@ func NewAuthorHandler(
 // @Tags Authors
 // @Param payload body dto.CreateNewAuthorReq true "payload"
 // @Success 200 {object} dto.BaseJSONResp{data=dto.CreateNewAuthorRespData}
+// @Security BearerAuth
 func (h *AuthorHandler) CreateNewAuthor(ctx *gin.Context) {
 	var payload dto.CreateNewAuthorReq
 	err := ctx.ShouldBindJSON(&payload)
@@ -66,6 +67,7 @@ func (h *AuthorHandler) CreateNewAuthor(ctx *gin.Context) {
 // @Tags Authors
 // @Param payload body dto.EditAuthorReq true "payload"
 // @Success 200 {object} dto.BaseJSONResp{data=dto.EditAuthorRespData}
+// @Security BearerAuth
 func (h *AuthorHandler) EditMe(ctx *gin.Context) {
 	var payload dto.EditAuthorReq
 	err := ctx.ShouldBindJSON(&payload)
@@ -94,6 +96,7 @@ func (h *AuthorHandler) EditMe(ctx *gin.Context) {
 // @Tags Authors
 // @Param payload body dto.EditAuthorReq true "payload"
 // @Success 200 {object} dto.BaseJSONResp{data=dto.EditAuthorRespData}
+// @Security BearerAuth
 func (h *AuthorHandler) EditAuthor(ctx *gin.Context) {
 	authorUUID := ctx.Param("author_uuid")
 
@@ -123,6 +126,7 @@ func (h *AuthorHandler) EditAuthor(ctx *gin.Context) {
 // @Router /authors/{author_uuid} [delete]
 // @Tags Authors
 // @Success 200 {object} dto.BaseJSONResp{data=dto.DeleteAuthorRespData}
+// @Security BearerAuth
 func (h *AuthorHandler) DeleteAuthor(ctx *gin.Context) {
 	authorUUID := ctx.Param("author_uuid")
 
@@ -143,6 +147,7 @@ func (h *AuthorHandler) DeleteAuthor(ctx *gin.Context) {
 // @Router /authors/me [get]
 // @Tags Authors
 // @Success 200 {object} dto.BaseJSONResp{data=dto.GetAuthorDetailRespData}
+// @Security BearerAuth
 func (h *AuthorHandler) GetMe(ctx *gin.Context) {
 	resp, err := h.authorUcase.GetAuthorDetail(ctx, "me")
 	if err != nil {
@@ -161,6 +166,7 @@ func (h *AuthorHandler) GetMe(ctx *gin.Context) {
 // @Router /authors/{author_uuid} [get]
 // @Tags Authors
 // @Success 200 {object} dto.BaseJSONResp{data=dto.GetAuthorDetailRespData}
+// @Security BearerAuth
 func (h *AuthorHandler) GetAuthorDetail(ctx *gin.Context) {
 	authorUUID := ctx.Param("author_uuid")
 
@@ -182,6 +188,7 @@ func (h *AuthorHandler) GetAuthorDetail(ctx *gin.Context) {
 // @Tags Authors
 // @Param query query dto.GetAuthorListReq false "queries"
 // @Success 200 {object} dto.BaseJSONResp{data=dto.GetAuthorListRespData}
+// @Security BearerAuth
 func (h *AuthorHandler) GetList(ctx *gin.Context) {
 	var query dto.GetAuthorListReq
 	err := ctx.ShouldBindQuery(&query)

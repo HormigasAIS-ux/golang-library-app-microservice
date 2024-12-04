@@ -53,6 +53,7 @@ func (u *AuthorUcase) CreateNewAuthor(
 	ctx context.Context,
 	payload dto.CreateNewAuthorReq,
 ) (*dto.CreateNewAuthorRespData, error) {
+	logger.Debugf("CreateNewAuthor in")
 	var parsedUserUUID uuid.UUID
 	var userEmail string
 	var userUsername string
@@ -60,15 +61,18 @@ func (u *AuthorUcase) CreateNewAuthor(
 	var err error
 
 	if payload.UserUUID != nil { // user uuid provided for auth service grpc call
+		logger.Debugf("payload.UserUUID: %s", *payload.UserUUID)
 		getUserResp, grpcCode, err := u.authRepo.RpcGetUserByUUID(
 			ctx,
 			&auth_pb.GetUserByUUIDRequest{
 				Uuid: *payload.UserUUID,
 			},
 		)
+		logger.Debugf("getUserResp: %v, grpcCode: %v, err: %v", getUserResp, grpcCode, err)
 		if grpcCode != codes.OK {
 			switch grpcCode {
 			case codes.NotFound:
+				logger.Errorf("user not found: %s", err.Error())
 				return nil, &error_utils.CustomErr{
 					HttpCode: 400,
 					GrpcCode: grpcCode,
@@ -76,6 +80,7 @@ func (u *AuthorUcase) CreateNewAuthor(
 					Detail:   err.Error(),
 				}
 			default:
+				logger.Errorf("error getting user: %s", err.Error())
 				return nil, &error_utils.CustomErr{
 					HttpCode: 500,
 					GrpcCode: grpcCode,
@@ -96,6 +101,7 @@ func (u *AuthorUcase) CreateNewAuthor(
 
 		parsedUserUUID, err = uuid.Parse(getUserResp.Uuid)
 		if err != nil {
+			logger.Errorf("error parsing user uuid: %s", err.Error())
 			return nil, err
 		}
 		userEmail = getUserResp.Email
@@ -116,6 +122,7 @@ func (u *AuthorUcase) CreateNewAuthor(
 		if grpcCode != codes.OK {
 			switch grpcCode {
 			case codes.AlreadyExists:
+				logger.Errorf("user already exists: %s", err.Error())
 				return nil, &error_utils.CustomErr{
 					HttpCode: 400,
 					GrpcCode: grpcCode,
@@ -123,6 +130,7 @@ func (u *AuthorUcase) CreateNewAuthor(
 					Detail:   err.Error(),
 				}
 			default:
+				logger.Errorf("error creating user: %s", err.Error())
 				return nil, &error_utils.CustomErr{
 					HttpCode: 500,
 					GrpcCode: grpcCode,
@@ -133,6 +141,7 @@ func (u *AuthorUcase) CreateNewAuthor(
 		}
 
 		if createUserResp == nil {
+			logger.Errorf("create user resp is nil")
 			return nil, &error_utils.CustomErr{
 				HttpCode: 500,
 				GrpcCode: grpcCode,
@@ -143,6 +152,7 @@ func (u *AuthorUcase) CreateNewAuthor(
 
 		parsedUserUUID, err = uuid.Parse(createUserResp.Uuid)
 		if err != nil {
+			logger.Errorf("error parsing user uuid: %s", err.Error())
 			return nil, err
 		}
 
@@ -163,6 +173,7 @@ func (u *AuthorUcase) CreateNewAuthor(
 	// validate
 	err = newAuthor.Validate()
 	if err != nil {
+		logger.Errorf("author validation error: %s", err.Error())
 		return nil, &error_utils.CustomErr{
 			HttpCode: 400,
 			Message:  err.Error(),
@@ -173,6 +184,7 @@ func (u *AuthorUcase) CreateNewAuthor(
 	// create
 	err = u.authorRepo.Create(newAuthor)
 	if err != nil {
+		logger.Errorf("error creating author: %s", err.Error())
 		return nil, err
 	}
 
