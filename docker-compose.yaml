@@ -20,7 +20,7 @@ services:
   syn_auth_service_rest:
     image: ${AUTH_SERVICE_IMAGE}
     container_name: syn_auth_service_rest
-    command: ["./auth_service", "--server=rest"]
+    command: ["./auth_service", "--server=rest", , "--seed=user"]
     ports:
       - "8001:8001"
     networks:
@@ -36,6 +36,32 @@ services:
     command: ["./auth_service", "--server=grpc"]
     ports:
       - "7001:7001"
+    networks:
+      - my_network
+    env_file:
+      - ./auth_service/.env
+    depends_on:
+      - backend_syn_db
+
+  syn_author_service_rest:
+    image: ${AUTHOR_SERVICE_IMAGE}
+    container_name: syn_author_service_rest
+    command: ["./author_service", "--server=rest"]
+    ports:
+      - "8002:8002"
+    networks:
+      - my_network
+    env_file:
+      - ./auth_service/.env
+    depends_on:
+      - backend_syn_db
+
+  syn_author_service_grpc:
+    image: ${AUTHOR_SERVICE_IMAGE}
+    container_name: syn_author_service_grpc
+    command: ["./author_service", "--server=grpc"]
+    ports:
+      - "7002:7002"
     networks:
       - my_network
     env_file:

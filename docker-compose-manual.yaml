@@ -45,6 +45,34 @@ services:
     depends_on:
       - backend_syn_db
 
+  syn_author_service_rest:
+    build:
+      context: ./author_service
+    container_name: syn_author_service_rest
+    command: ["./author_service", "--server=rest"]
+    ports:
+      - "8002:8002"
+    networks:
+      - my_network
+    env_file:
+      - ./author_service/.env
+    depends_on:
+      - backend_syn_db
+
+  syn_author_service_grpc:
+    build:
+      context: ./author_service
+    container_name: syn_author_service_grpc
+    command: ["./author_service", "--server=grpc"]
+    ports:
+      - "7002:7002"
+    networks:
+      - my_network
+    env_file:
+      - ./author_service/.env
+    depends_on:
+      - backend_syn_db
+
 volumes:
   postgres_data:
 

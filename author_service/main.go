@@ -7,6 +7,7 @@ import (
 	"author_service/interface/grpc"
 	"author_service/interface/rest"
 	"author_service/repository"
+	"author_service/utils/helper"
 	"fmt"
 	"os"
 	"strings"
@@ -27,6 +28,7 @@ var logger = logging.MustGetLogger("main")
 // @name Authorization
 // @description JWT Authorization header using the Bearer scheme (add 'Bearer ' prefix).
 func main() {
+	logger.Debugf("Envs: %v", helper.PrettyJson(config.Envs))
 	gormDB := config.NewPostgresqlDB()
 	authGrpcServiceConn := config.NewAuthGrpcServiceConn()
 

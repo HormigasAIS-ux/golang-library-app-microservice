@@ -8,6 +8,7 @@ import (
 	"auth_service/interface/rest"
 	"auth_service/repository"
 	ucase "auth_service/usecase"
+	"auth_service/utils/helper"
 	seeder_util "auth_service/utils/seeder/user"
 	"fmt"
 	"os"
@@ -29,6 +30,8 @@ var logger = logging.MustGetLogger("main")
 // @name Authorization
 // @description JWT Authorization header using the Bearer scheme (add 'Bearer ' prefix).
 func main() {
+	logger.Debugf("Envs: %v", helper.PrettyJson(config.Envs))
+
 	gormDB := config.NewPostgresqlDB()
 
 	// migrations
