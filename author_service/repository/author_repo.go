@@ -17,6 +17,7 @@ type AuthorRepo struct {
 type IAuthorRepo interface {
 	Create(author *model.Author) error
 	GetByUUID(uuid string) (*model.Author, error)
+	GetByUserUUID(uuid string) (*model.Author, error)
 	Update(author *model.Author) error
 	Delete(id string) error
 	GetList(
@@ -47,9 +48,20 @@ func (repo *AuthorRepo) GetByUUID(uuid string) (*model.Author, error) {
 	var author model.Author
 	if err := repo.db.First(&author, "uuid = ?", uuid).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
-			return nil, errors.New("author not found")
+			return nil, errors.New("not found")
 		}
-		return nil, errors.New("failed to get author")
+		return nil, errors.New("failed to get")
+	}
+	return &author, nil
+}
+
+func (repo *AuthorRepo) GetByUserUUID(uuid string) (*model.Author, error) {
+	var author model.Author
+	if err := repo.db.First(&author, "user_uuid = ?", uuid).Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return nil, errors.New("not found")
+		}
+		return nil, errors.New("failed to get")
 	}
 	return &author, nil
 }
@@ -61,6 +73,12 @@ func (repo *AuthorRepo) Update(author *model.Author) error {
 
 func (repo *AuthorRepo) Delete(id string) error {
 	err := repo.db.Delete(&model.Author{}, "id = ?", id).Error
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return errors.New("not found")
+		}
+		return errors.New("failed to delete")
+	}
 	return err
 }
 

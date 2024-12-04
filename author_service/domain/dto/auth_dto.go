@@ -4,5 +4,5 @@ type CurrentUser struct {
 	UUID     string `json:"uuid"`
 	Email    string `json:"email"`
 	Username string `json:"username"`
-	Fullname string `json:"fullname"`
+	Role     string `json:"role"`
 }

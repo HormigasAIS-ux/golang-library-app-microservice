@@ -9,6 +9,156 @@ definitions:
       message:
         type: string
     type: object
+  dto.CreateNewAuthorReq:
+    properties:
+      bio:
+        type: string
+      birth_date:
+        type: string
+      email:
+        type: string
+      first_name:
+        type: string
+      last_name:
+        type: string
+      password:
+        type: string
+      role:
+        enum:
+        - admin
+        - user
+        type: string
+      username:
+        type: string
+    required:
+    - email
+    - first_name
+    - password
+    - role
+    - username
+    type: object
+  dto.CreateNewAuthorRespData:
+    properties:
+      bio:
+        type: string
+      birth_date:
+        type: string
+      created_at:
+        type: string
+      email:
+        type: string
+      first_name:
+        type: string
+      last_name:
+        type: string
+      role:
+        type: string
+      updated_at:
+        type: string
+      user_uuid:
+        type: string
+      username:
+        type: string
+      uuid:
+        type: string
+    type: object
+  dto.DeleteAuthorRespData:
+    properties:
+      bio:
+        type: string
+      birth_date:
+        type: string
+      created_at:
+        type: string
+      email:
+        type: string
+      first_name:
+        type: string
+      last_name:
+        type: string
+      role:
+        type: string
+      updated_at:
+        type: string
+      user_uuid:
+        type: string
+      username:
+        type: string
+      uuid:
+        type: string
+    type: object
+  dto.EditAuthorReq:
+    properties:
+      bio:
+        type: string
+      birth_date:
+        type: string
+      email:
+        type: string
+      first_name:
+        type: string
+      last_name:
+        type: string
+      password:
+        type: string
+      role:
+        enum:
+        - admin
+        - user
+        type: string
+      username:
+        type: string
+    type: object
+  dto.EditAuthorRespData:
+    properties:
+      bio:
+        type: string
+      birth_date:
+        type: string
+      created_at:
+        type: string
+      email:
+        type: string
+      first_name:
+        type: string
+      last_name:
+        type: string
+      role:
+        type: string
+      updated_at:
+        type: string
+      user_uuid:
+        type: string
+      username:
+        type: string
+      uuid:
+        type: string
+    type: object
+  dto.GetAuthorDetailRespData:
+    properties:
+      bio:
+        type: string
+      birth_date:
+        type: string
+      created_at:
+        type: string
+      email:
+        type: string
+      first_name:
+        type: string
+      last_name:
+        type: string
+      role:
+        type: string
+      updated_at:
+        type: string
+      user_uuid:
+        type: string
+      username:
+        type: string
+      uuid:
+        type: string
+    type: object
   dto.GetAuthorListRespData:
     properties:
       current_page:
@@ -88,6 +238,113 @@ paths:
                   $ref: '#/definitions/dto.GetAuthorListRespData'
               type: object
       summary: Get Author List
+      tags:
+      - Authors
+    post:
+      parameters:
+      - description: payload
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CreateNewAuthorReq'
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/dto.BaseJSONResp'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.CreateNewAuthorRespData'
+              type: object
+      summary: Create new author
+      tags:
+      - Authors
+  /authors/{author_uuid}:
+    delete:
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/dto.BaseJSONResp'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.DeleteAuthorRespData'
+              type: object
+      summary: Delete author
+      tags:
+      - Authors
+    get:
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/dto.BaseJSONResp'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.GetAuthorDetailRespData'
+              type: object
+      summary: Get author detail
+      tags:
+      - Authors
+    patch:
+      parameters:
+      - description: payload
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/dto.EditAuthorReq'
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/dto.BaseJSONResp'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.EditAuthorRespData'
+              type: object
+      summary: Edit author
+      tags:
+      - Authors
+  /authors/me:
+    get:
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/dto.BaseJSONResp'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.GetAuthorDetailRespData'
+              type: object
+      summary: Get my author profile detail
+      tags:
+      - Authors
+    patch:
+      parameters:
+      - description: payload
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/dto.EditAuthorReq'
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/dto.BaseJSONResp'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.EditAuthorRespData'
+              type: object
+      summary: Edit my author profile
       tags:
       - Authors
 securityDefinitions:
