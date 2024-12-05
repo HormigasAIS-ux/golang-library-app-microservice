@@ -24,6 +24,7 @@ services:
       timeout: 5s
     restart: always
 
+  # AUTH SERVICE
   syn_auth_service_rest:
     image: ${AUTH_SERVICE_IMAGE}
     build:
@@ -75,6 +76,7 @@ services:
       - syn_auth_service_grpc
       - syn_author_service_grpc
 
+  # AUTHOR SERVICE
   syn_author_service_rest:
     image: ${AUTHOR_SERVICE_IMAGE}
     build:
@@ -92,7 +94,6 @@ services:
         condition: service_healthy
     restart: always
 
-
   syn_author_service_grpc:
     image: ${AUTHOR_SERVICE_IMAGE}
     build:
@@ -105,6 +106,42 @@ services:
       - my_network
     env_file:
       - ./author_service/.env
+    depends_on:
+      backend_syn_db:
+        condition: service_healthy
+    restart: always
+
+    # BOOK SERVICE
+  syn_book_service_rest:
+    image: ${BOOK_SERVICE_IMAGE}
+    build:
+      context: ./book_service
+    container_name: syn_book_service_rest
+    command: ["./book_service", "--server=rest"]
+    ports:
+      - "8003:8003"
+    networks:
+      - my_network
+    env_file:
+      - ./book_service/.env
+    depends_on:
+      backend_syn_db:
+        condition: service_healthy
+    restart: always
+
+
+  syn_book_service_grpc:
+    image: ${BOOK_SERVICE_IMAGE}
+    build:
+      context: ./book_service
+    container_name: syn_book_service_grpc
+    command: ["./book_service", "--server=grpc"]
+    ports:
+      - "7003:7003"
+    networks:
+      - my_network
+    env_file:
+      - ./book_service/.env
     depends_on:
       backend_syn_db:
         condition: service_healthy

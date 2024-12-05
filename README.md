@@ -1,5 +1,21 @@
 # BACKEND (STILL DEVELOPMENT)
 
+### Key Features
+1. **Role-Based Access Control (RBAC)**
+Provides fine-grained access control for different user roles (e.g., Admin, Librarian, Member).
+Ensures that only authorized users can perform specific operations on the system.
+2. **Authentication and Authorization**
+Utilizes JWT (JSON Web Tokens) for secure and stateless authentication.
+Access tokens are used to validate and authorize user requests across services.
+3. **gRPC for Service Communication**
+Implements gRPC for efficient and reliable communication between microservices.
+Ensures high performance with protocol buffers (protobuf) for data serialization.
+Services communicate seamlessly using RPC methods for actions like creating books, authors, and user management.
+4. **REST API with Swagger Documentation**
+Provides a RESTful API for external interaction with the system.
+The API is documented using Swagger for easy exploration and testing.
+API documentation is automatically generated and accessible through a web interface.
+
 ## Setup
 This project consists of four services: `auth_service`, `book_service`, `category_service`, and `author_service`. Below are the steps to set up and run the services.
 
@@ -54,6 +70,7 @@ This project consists of four services: `auth_service`, `book_service`, `categor
   `http://{host}:8002/swagger/index.html`
 
 - category_service: Not implemented yet
+  `http://{host}:8003/swagger/index.html`
 
 - author_service: Not implemented yet
 

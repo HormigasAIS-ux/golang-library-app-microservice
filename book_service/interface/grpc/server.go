@@ -3,8 +3,6 @@ package grpc
 import (
 	"book_service/config"
 	interface_pkg "book_service/interface"
-	"book_service/interface/grpc/genproto/author"
-	"book_service/interface/grpc/handler"
 	"fmt"
 	"log"
 	"net"
@@ -26,9 +24,6 @@ func SetupServer(commonDependencies interface_pkg.CommonDependency) {
 	grpcServer := grpc.NewServer()
 
 	// register service handler
-	// logger.Debugf("ucase: %v", commonDependencies.AuthorUcase)
-	authServiceHandler := handler.NewAuthorServiceHandler(commonDependencies.AuthorUcase)
-	author.RegisterAuthorServiceServer(grpcServer, authServiceHandler)
 
 	// Start the server
 	fmt.Printf("Starting gRPC server on port :%v...", config.Envs.GRPC_PORT)

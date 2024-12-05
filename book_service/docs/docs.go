@@ -15,85 +15,7 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/authors": {
-            "get": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "tags": [
-                    "Authors"
-                ],
-                "summary": "Get Author List",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "default": 10,
-                        "name": "limit",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "default": 1,
-                        "name": "page",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "name": "query",
-                        "in": "query"
-                    },
-                    {
-                        "enum": [
-                            "first_name",
-                            "last_name",
-                            "birth_date",
-                            "any"
-                        ],
-                        "type": "string",
-                        "default": "any",
-                        "name": "query_by",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "default": "created_at",
-                        "name": "sort_by",
-                        "in": "query"
-                    },
-                    {
-                        "enum": [
-                            "asc",
-                            "desc"
-                        ],
-                        "type": "string",
-                        "name": "sort_order",
-                        "in": "query",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/dto.BaseJSONResp"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "data": {
-                                            "$ref": "#/definitions/dto.GetAuthorListRespData"
-                                        }
-                                    }
-                                }
-                            ]
-                        }
-                    }
-                }
-            },
+        "/books": {
             "post": {
                 "security": [
                     {
@@ -101,7 +23,7 @@ const docTemplate = `{
                     }
                 ],
                 "tags": [
-                    "Authors"
+                    "Books"
                 ],
                 "summary": "Create new author",
                 "parameters": [
@@ -111,7 +33,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dto.CreateNewAuthorReq"
+                            "$ref": "#/definitions/dto.CreateBookReq"
                         }
                     }
                 ],
@@ -127,188 +49,7 @@ const docTemplate = `{
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/dto.CreateNewAuthorRespData"
-                                        }
-                                    }
-                                }
-                            ]
-                        }
-                    }
-                }
-            }
-        },
-        "/authors/me": {
-            "get": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "tags": [
-                    "Authors"
-                ],
-                "summary": "Get my author profile detail",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/dto.BaseJSONResp"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "data": {
-                                            "$ref": "#/definitions/dto.GetAuthorDetailRespData"
-                                        }
-                                    }
-                                }
-                            ]
-                        }
-                    }
-                }
-            },
-            "patch": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "tags": [
-                    "Authors"
-                ],
-                "summary": "Edit my author profile",
-                "parameters": [
-                    {
-                        "description": "payload",
-                        "name": "payload",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/dto.EditAuthorReq"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/dto.BaseJSONResp"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "data": {
-                                            "$ref": "#/definitions/dto.EditAuthorRespData"
-                                        }
-                                    }
-                                }
-                            ]
-                        }
-                    }
-                }
-            }
-        },
-        "/authors/{author_uuid}": {
-            "get": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "tags": [
-                    "Authors"
-                ],
-                "summary": "Get author detail",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/dto.BaseJSONResp"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "data": {
-                                            "$ref": "#/definitions/dto.GetAuthorDetailRespData"
-                                        }
-                                    }
-                                }
-                            ]
-                        }
-                    }
-                }
-            },
-            "delete": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "tags": [
-                    "Authors"
-                ],
-                "summary": "Delete author",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/dto.BaseJSONResp"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "data": {
-                                            "$ref": "#/definitions/dto.DeleteAuthorRespData"
-                                        }
-                                    }
-                                }
-                            ]
-                        }
-                    }
-                }
-            },
-            "patch": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "tags": [
-                    "Authors"
-                ],
-                "summary": "Edit author",
-                "parameters": [
-                    {
-                        "description": "payload",
-                        "name": "payload",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/dto.EditAuthorReq"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/dto.BaseJSONResp"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "data": {
-                                            "$ref": "#/definitions/dto.EditAuthorRespData"
+                                            "$ref": "#/definitions/dto.CreateBookResp"
                                         }
                                     }
                                 }
@@ -333,277 +74,40 @@ const docTemplate = `{
                 }
             }
         },
-        "dto.CreateNewAuthorReq": {
+        "dto.CreateBookReq": {
             "type": "object",
             "required": [
-                "email",
-                "first_name",
-                "password",
-                "role",
-                "username"
+                "stock",
+                "title"
             ],
             "properties": {
-                "bio": {
+                "category_uuid": {
                     "type": "string"
                 },
-                "birth_date": {
-                    "type": "string"
+                "stock": {
+                    "type": "integer"
                 },
-                "email": {
-                    "type": "string"
-                },
-                "first_name": {
-                    "type": "string"
-                },
-                "last_name": {
-                    "type": "string"
-                },
-                "password": {
-                    "type": "string"
-                },
-                "role": {
-                    "type": "string",
-                    "enum": [
-                        "admin",
-                        "user"
-                    ]
-                },
-                "user_uuid": {
-                    "description": "required for create new author by auth service, optional for client",
-                    "type": "string"
-                },
-                "username": {
+                "title": {
                     "type": "string"
                 }
             }
         },
-        "dto.CreateNewAuthorRespData": {
+        "dto.CreateBookResp": {
             "type": "object",
             "properties": {
-                "bio": {
+                "author_uuid": {
                     "type": "string"
                 },
-                "birth_date": {
+                "category_uuid": {
                     "type": "string"
                 },
                 "created_at": {
                     "type": "string"
                 },
-                "email": {
-                    "type": "string"
-                },
-                "first_name": {
-                    "type": "string"
-                },
-                "last_name": {
-                    "type": "string"
-                },
-                "role": {
-                    "type": "string"
-                },
-                "updated_at": {
-                    "type": "string"
-                },
-                "user_uuid": {
-                    "type": "string"
-                },
-                "username": {
-                    "type": "string"
-                },
-                "uuid": {
-                    "type": "string"
-                }
-            }
-        },
-        "dto.DeleteAuthorRespData": {
-            "type": "object",
-            "properties": {
-                "bio": {
-                    "type": "string"
-                },
-                "birth_date": {
-                    "type": "string"
-                },
-                "created_at": {
-                    "type": "string"
-                },
-                "email": {
-                    "type": "string"
-                },
-                "first_name": {
-                    "type": "string"
-                },
-                "last_name": {
-                    "type": "string"
-                },
-                "role": {
-                    "type": "string"
-                },
-                "updated_at": {
-                    "type": "string"
-                },
-                "user_uuid": {
-                    "type": "string"
-                },
-                "username": {
-                    "type": "string"
-                },
-                "uuid": {
-                    "type": "string"
-                }
-            }
-        },
-        "dto.EditAuthorReq": {
-            "type": "object",
-            "properties": {
-                "bio": {
-                    "type": "string"
-                },
-                "birth_date": {
-                    "type": "string"
-                },
-                "email": {
-                    "type": "string"
-                },
-                "first_name": {
-                    "type": "string"
-                },
-                "last_name": {
-                    "type": "string"
-                },
-                "password": {
-                    "type": "string"
-                },
-                "role": {
-                    "type": "string",
-                    "enum": [
-                        "admin",
-                        "user"
-                    ]
-                },
-                "username": {
-                    "type": "string"
-                }
-            }
-        },
-        "dto.EditAuthorRespData": {
-            "type": "object",
-            "properties": {
-                "bio": {
-                    "type": "string"
-                },
-                "birth_date": {
-                    "type": "string"
-                },
-                "created_at": {
-                    "type": "string"
-                },
-                "email": {
-                    "type": "string"
-                },
-                "first_name": {
-                    "type": "string"
-                },
-                "last_name": {
-                    "type": "string"
-                },
-                "role": {
-                    "type": "string"
-                },
-                "updated_at": {
-                    "type": "string"
-                },
-                "user_uuid": {
-                    "type": "string"
-                },
-                "username": {
-                    "type": "string"
-                },
-                "uuid": {
-                    "type": "string"
-                }
-            }
-        },
-        "dto.GetAuthorDetailRespData": {
-            "type": "object",
-            "properties": {
-                "bio": {
-                    "type": "string"
-                },
-                "birth_date": {
-                    "type": "string"
-                },
-                "book_total": {
+                "stock": {
                     "type": "integer"
                 },
-                "created_at": {
-                    "type": "string"
-                },
-                "email": {
-                    "type": "string"
-                },
-                "first_name": {
-                    "type": "string"
-                },
-                "last_name": {
-                    "type": "string"
-                },
-                "role": {
-                    "type": "string"
-                },
-                "updated_at": {
-                    "type": "string"
-                },
-                "user_uuid": {
-                    "type": "string"
-                },
-                "username": {
-                    "type": "string"
-                },
-                "uuid": {
-                    "type": "string"
-                }
-            }
-        },
-        "dto.GetAuthorListRespData": {
-            "type": "object",
-            "properties": {
-                "current_page": {
-                    "type": "integer"
-                },
-                "data": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/dto.GetAuthorListRespDataItem"
-                    }
-                },
-                "total_data": {
-                    "type": "integer"
-                },
-                "total_page": {
-                    "type": "integer"
-                }
-            }
-        },
-        "dto.GetAuthorListRespDataItem": {
-            "type": "object",
-            "properties": {
-                "bio": {
-                    "type": "string"
-                },
-                "birth_date": {
-                    "type": "string"
-                },
-                "book_total": {
-                    "type": "integer"
-                },
-                "created_at": {
-                    "type": "string"
-                },
-                "first_name": {
-                    "type": "string"
-                },
-                "last_name": {
+                "title": {
                     "type": "string"
                 },
                 "updated_at": {
@@ -631,7 +135,7 @@ var SwaggerInfo = &swag.Spec{
 	Host:             "",
 	BasePath:         "",
 	Schemes:          []string{},
-	Title:            "Author Service RESTful API",
+	Title:            "Book Service RESTful API",
 	Description:      "",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,

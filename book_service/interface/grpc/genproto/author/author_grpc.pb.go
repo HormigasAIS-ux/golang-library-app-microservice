@@ -19,7 +19,8 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	AuthorService_CreateAuthor_FullMethodName = "/author_service.AuthorService/CreateAuthor"
+	AuthorService_CreateAuthor_FullMethodName        = "/author_service.AuthorService/CreateAuthor"
+	AuthorService_GetAuthorByUserUUID_FullMethodName = "/author_service.AuthorService/GetAuthorByUserUUID"
 )
 
 // AuthorServiceClient is the client API for AuthorService service.
@@ -27,6 +28,7 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type AuthorServiceClient interface {
 	CreateAuthor(ctx context.Context, in *CreateAuthorReq, opts ...grpc.CallOption) (*CreateAuthorResp, error)
+	GetAuthorByUserUUID(ctx context.Context, in *GetAuthorByUserUUIDReq, opts ...grpc.CallOption) (*GetAuthorByUserUUIDResp, error)
 }
 
 type authorServiceClient struct {
@@ -47,11 +49,22 @@ func (c *authorServiceClient) CreateAuthor(ctx context.Context, in *CreateAuthor
 	return out, nil
 }
 
+func (c *authorServiceClient) GetAuthorByUserUUID(ctx context.Context, in *GetAuthorByUserUUIDReq, opts ...grpc.CallOption) (*GetAuthorByUserUUIDResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetAuthorByUserUUIDResp)
+	err := c.cc.Invoke(ctx, AuthorService_GetAuthorByUserUUID_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // AuthorServiceServer is the server API for AuthorService service.
 // All implementations must embed UnimplementedAuthorServiceServer
 // for forward compatibility.
 type AuthorServiceServer interface {
 	CreateAuthor(context.Context, *CreateAuthorReq) (*CreateAuthorResp, error)
+	GetAuthorByUserUUID(context.Context, *GetAuthorByUserUUIDReq) (*GetAuthorByUserUUIDResp, error)
 	mustEmbedUnimplementedAuthorServiceServer()
 }
 
@@ -64,6 +77,9 @@ type UnimplementedAuthorServiceServer struct{}
 
 func (UnimplementedAuthorServiceServer) CreateAuthor(context.Context, *CreateAuthorReq) (*CreateAuthorResp, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateAuthor not implemented")
+}
+func (UnimplementedAuthorServiceServer) GetAuthorByUserUUID(context.Context, *GetAuthorByUserUUIDReq) (*GetAuthorByUserUUIDResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetAuthorByUserUUID not implemented")
 }
 func (UnimplementedAuthorServiceServer) mustEmbedUnimplementedAuthorServiceServer() {}
 func (UnimplementedAuthorServiceServer) testEmbeddedByValue()                       {}
@@ -104,16 +120,38 @@ func _AuthorService_CreateAuthor_Handler(srv interface{}, ctx context.Context, d
 	return interceptor(ctx, in, info, handler)
 }
 
+func _AuthorService_GetAuthorByUserUUID_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetAuthorByUserUUIDReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthorServiceServer).GetAuthorByUserUUID(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AuthorService_GetAuthorByUserUUID_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthorServiceServer).GetAuthorByUserUUID(ctx, req.(*GetAuthorByUserUUIDReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // AuthorService_ServiceDesc is the grpc.ServiceDesc for AuthorService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var AuthorService_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "book_service.AuthorService",
+	ServiceName: "author_service.AuthorService",
 	HandlerType: (*AuthorServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
 			MethodName: "CreateAuthor",
 			Handler:    _AuthorService_CreateAuthor_Handler,
+		},
+		{
+			MethodName: "GetAuthorByUserUUID",
+			Handler:    _AuthorService_GetAuthorByUserUUID_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

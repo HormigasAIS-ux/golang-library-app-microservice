@@ -11,7 +11,7 @@ type HttpResponseWriter struct{}
 
 type IHttpResponseWriter interface {
 	HTTPCustomErr(ctx *gin.Context, err error)
-	HTTPJson(ctx *gin.Context, code int, message string, detail string, data interface{})
+	HTTPJson(ctx *gin.Context, code int, message string, detail interface{}, data interface{})
 	HTTPJsonOK(ctx *gin.Context, data interface{})
 }
 
@@ -38,7 +38,7 @@ func (r *HttpResponseWriter) HTTPCustomErr(ctx *gin.Context, err error) {
 	})
 }
 
-func (r *HttpResponseWriter) HTTPJson(ctx *gin.Context, code int, message string, detail string, data interface{}) {
+func (r *HttpResponseWriter) HTTPJson(ctx *gin.Context, code int, message string, detail interface{}, data interface{}) {
 	ctx.JSON(code, dto.BaseJSONResp{
 		Code:    code,
 		Message: message,

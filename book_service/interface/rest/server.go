@@ -25,14 +25,14 @@ func SetupServer(commonDependencies interface_pkg.CommonDependency) {
 	respWriter := http_response.NewHttpResponseWriter()
 
 	// handlers
-	authorHandler := rest_handler.NewAuthorHandler(
-		commonDependencies.AuthorUcase,
+	bookHandler := rest_handler.NewBookHandler(
+		commonDependencies.BookUcase,
 		respWriter,
 	)
 
 	// middlewares
 	authMiddleware := rest_middleware.AuthMiddleware(respWriter)
-	authMiddlewareAdminOnly := rest_middleware.AuthAdminOnlyMiddleware(respWriter)
+	// authMiddlewareAdminOnly := rest_middleware.AuthAdminOnlyMiddleware(respWriter)
 
 	// register routes
 	router.GET("/ping", func(c *gin.Context) {
@@ -46,21 +46,10 @@ func SetupServer(commonDependencies interface_pkg.CommonDependency) {
 	secureRouter.Use(authMiddleware)
 	// secured
 	{
-		// /authors
-		authorRouter := secureRouter.Group("/authors")
+		// /books
+		bookRouter := secureRouter.Group("/books")
 		{
-			authorRouter.PATCH("/me", authorHandler.EditMe)
-			authorRouter.GET("/me", authorHandler.GetMe)
-			authorRouter.GET("/:author_uuid", authorHandler.GetAuthorDetail)
-			authorRouter.GET("", authorHandler.GetList)
-
-			// admin only
-			authorRouterAdminOnly := authorRouter.Group("").Use(authMiddlewareAdminOnly)
-			{
-				authorRouterAdminOnly.POST("", authorHandler.CreateNewAuthor).Use(authMiddlewareAdminOnly)
-				authorRouterAdminOnly.PATCH("/:author_uuid", authorHandler.EditAuthor).Use(authMiddlewareAdminOnly)
-				authorRouterAdminOnly.DELETE("/:author_uuid", authorHandler.DeleteAuthor).Use(authMiddlewareAdminOnly)
-			}
+			bookRouter.POST("", bookHandler.Create)
 		}
 	}
 

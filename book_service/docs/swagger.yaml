@@ -8,188 +8,29 @@ definitions:
       message:
         type: string
     type: object
-  dto.CreateNewAuthorReq:
+  dto.CreateBookReq:
     properties:
-      bio:
+      category_uuid:
         type: string
-      birth_date:
-        type: string
-      email:
-        type: string
-      first_name:
-        type: string
-      last_name:
-        type: string
-      password:
-        type: string
-      role:
-        enum:
-        - admin
-        - user
-        type: string
-      user_uuid:
-        description: required for create new author by auth service, optional for
-          client
-        type: string
-      username:
+      stock:
+        type: integer
+      title:
         type: string
     required:
-    - email
-    - first_name
-    - password
-    - role
-    - username
+    - stock
+    - title
     type: object
-  dto.CreateNewAuthorRespData:
+  dto.CreateBookResp:
     properties:
-      bio:
+      author_uuid:
         type: string
-      birth_date:
+      category_uuid:
         type: string
       created_at:
         type: string
-      email:
-        type: string
-      first_name:
-        type: string
-      last_name:
-        type: string
-      role:
-        type: string
-      updated_at:
-        type: string
-      user_uuid:
-        type: string
-      username:
-        type: string
-      uuid:
-        type: string
-    type: object
-  dto.DeleteAuthorRespData:
-    properties:
-      bio:
-        type: string
-      birth_date:
-        type: string
-      created_at:
-        type: string
-      email:
-        type: string
-      first_name:
-        type: string
-      last_name:
-        type: string
-      role:
-        type: string
-      updated_at:
-        type: string
-      user_uuid:
-        type: string
-      username:
-        type: string
-      uuid:
-        type: string
-    type: object
-  dto.EditAuthorReq:
-    properties:
-      bio:
-        type: string
-      birth_date:
-        type: string
-      email:
-        type: string
-      first_name:
-        type: string
-      last_name:
-        type: string
-      password:
-        type: string
-      role:
-        enum:
-        - admin
-        - user
-        type: string
-      username:
-        type: string
-    type: object
-  dto.EditAuthorRespData:
-    properties:
-      bio:
-        type: string
-      birth_date:
-        type: string
-      created_at:
-        type: string
-      email:
-        type: string
-      first_name:
-        type: string
-      last_name:
-        type: string
-      role:
-        type: string
-      updated_at:
-        type: string
-      user_uuid:
-        type: string
-      username:
-        type: string
-      uuid:
-        type: string
-    type: object
-  dto.GetAuthorDetailRespData:
-    properties:
-      bio:
-        type: string
-      birth_date:
-        type: string
-      book_total:
+      stock:
         type: integer
-      created_at:
-        type: string
-      email:
-        type: string
-      first_name:
-        type: string
-      last_name:
-        type: string
-      role:
-        type: string
-      updated_at:
-        type: string
-      user_uuid:
-        type: string
-      username:
-        type: string
-      uuid:
-        type: string
-    type: object
-  dto.GetAuthorListRespData:
-    properties:
-      current_page:
-        type: integer
-      data:
-        items:
-          $ref: '#/definitions/dto.GetAuthorListRespDataItem'
-        type: array
-      total_data:
-        type: integer
-      total_page:
-        type: integer
-    type: object
-  dto.GetAuthorListRespDataItem:
-    properties:
-      bio:
-        type: string
-      birth_date:
-        type: string
-      book_total:
-        type: integer
-      created_at:
-        type: string
-      first_name:
-        type: string
-      last_name:
+      title:
         type: string
       updated_at:
         type: string
@@ -198,57 +39,9 @@ definitions:
     type: object
 info:
   contact: {}
-  title: Author Service RESTful API
+  title: Book Service RESTful API
 paths:
-  /authors:
-    get:
-      parameters:
-      - default: 10
-        in: query
-        name: limit
-        type: integer
-      - default: 1
-        in: query
-        name: page
-        type: integer
-      - in: query
-        name: query
-        type: string
-      - default: any
-        enum:
-        - first_name
-        - last_name
-        - birth_date
-        - any
-        in: query
-        name: query_by
-        type: string
-      - default: created_at
-        in: query
-        name: sort_by
-        type: string
-      - enum:
-        - asc
-        - desc
-        in: query
-        name: sort_order
-        required: true
-        type: string
-      responses:
-        "200":
-          description: OK
-          schema:
-            allOf:
-            - $ref: '#/definitions/dto.BaseJSONResp'
-            - properties:
-                data:
-                  $ref: '#/definitions/dto.GetAuthorListRespData'
-              type: object
-      security:
-      - BearerAuth: []
-      summary: Get Author List
-      tags:
-      - Authors
+  /books:
     post:
       parameters:
       - description: payload
@@ -256,7 +49,7 @@ paths:
         name: payload
         required: true
         schema:
-          $ref: '#/definitions/dto.CreateNewAuthorReq'
+          $ref: '#/definitions/dto.CreateBookReq'
       responses:
         "200":
           description: OK
@@ -265,109 +58,13 @@ paths:
             - $ref: '#/definitions/dto.BaseJSONResp'
             - properties:
                 data:
-                  $ref: '#/definitions/dto.CreateNewAuthorRespData'
+                  $ref: '#/definitions/dto.CreateBookResp'
               type: object
       security:
       - BearerAuth: []
       summary: Create new author
       tags:
-      - Authors
-  /authors/{author_uuid}:
-    delete:
-      responses:
-        "200":
-          description: OK
-          schema:
-            allOf:
-            - $ref: '#/definitions/dto.BaseJSONResp'
-            - properties:
-                data:
-                  $ref: '#/definitions/dto.DeleteAuthorRespData'
-              type: object
-      security:
-      - BearerAuth: []
-      summary: Delete author
-      tags:
-      - Authors
-    get:
-      responses:
-        "200":
-          description: OK
-          schema:
-            allOf:
-            - $ref: '#/definitions/dto.BaseJSONResp'
-            - properties:
-                data:
-                  $ref: '#/definitions/dto.GetAuthorDetailRespData'
-              type: object
-      security:
-      - BearerAuth: []
-      summary: Get author detail
-      tags:
-      - Authors
-    patch:
-      parameters:
-      - description: payload
-        in: body
-        name: payload
-        required: true
-        schema:
-          $ref: '#/definitions/dto.EditAuthorReq'
-      responses:
-        "200":
-          description: OK
-          schema:
-            allOf:
-            - $ref: '#/definitions/dto.BaseJSONResp'
-            - properties:
-                data:
-                  $ref: '#/definitions/dto.EditAuthorRespData'
-              type: object
-      security:
-      - BearerAuth: []
-      summary: Edit author
-      tags:
-      - Authors
-  /authors/me:
-    get:
-      responses:
-        "200":
-          description: OK
-          schema:
-            allOf:
-            - $ref: '#/definitions/dto.BaseJSONResp'
-            - properties:
-                data:
-                  $ref: '#/definitions/dto.GetAuthorDetailRespData'
-              type: object
-      security:
-      - BearerAuth: []
-      summary: Get my author profile detail
-      tags:
-      - Authors
-    patch:
-      parameters:
-      - description: payload
-        in: body
-        name: payload
-        required: true
-        schema:
-          $ref: '#/definitions/dto.EditAuthorReq'
-      responses:
-        "200":
-          description: OK
-          schema:
-            allOf:
-            - $ref: '#/definitions/dto.BaseJSONResp'
-            - properties:
-                data:
-                  $ref: '#/definitions/dto.EditAuthorRespData'
-              type: object
-      security:
-      - BearerAuth: []
-      summary: Edit my author profile
-      tags:
-      - Authors
+      - Books
 securityDefinitions:
   BearerAuth:
     description: JWT Authorization header using the Bearer scheme (add 'Bearer ' prefix).

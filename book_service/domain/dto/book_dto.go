@@ -32,12 +32,13 @@ type GetBookListRespData struct {
 }
 
 type BookRepo_GetListParams struct {
-	Query     string
-	QueryBy   string
-	Page      int
-	Limit     int
-	SortOrder string
-	SortBy    string
+	AuthorUUID string
+	Query      string
+	QueryBy    string
+	Page       int
+	Limit      int
+	SortOrder  string
+	SortBy     string
 }
 
 type CreateNewBookReq struct {

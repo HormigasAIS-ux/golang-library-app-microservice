@@ -83,6 +83,10 @@ func (repo *BookRepo) GetList(
 
 	tx := repo.db.Model(&models)
 
+	if params.AuthorUUID != "" {
+		tx = tx.Where("author_uuid = ?", params.AuthorUUID)
+	}
+
 	if params.Query != "" {
 		if params.QueryBy != "" {
 			tx = tx.Where("? LIKE ?", params.QueryBy, "%"+params.Query+"%")
@@ -118,6 +122,10 @@ func (repo *BookRepo) CountGetList(
 	params dto.BookRepo_GetListParams,
 ) (int64, error) {
 	tx := repo.db.Model(&model.Book{})
+
+	if params.AuthorUUID != "" {
+		tx = tx.Where("author_uuid = ?", params.AuthorUUID)
+	}
 
 	if params.Query != "" {
 		if params.QueryBy != "" {

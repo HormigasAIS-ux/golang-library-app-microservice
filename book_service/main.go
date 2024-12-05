@@ -31,7 +31,8 @@ var logger = logging.MustGetLogger("main")
 func main() {
 	logger.Debugf("Envs: %v", helper.PrettyJson(config.Envs))
 	gormDB := config.NewPostgresqlDB()
-	authGrpcServiceClient := config.NewAuthGrpcServiceClient()
+	// authGrpcServiceClient := config.NewAuthGrpcServiceClient()
+	authorGrpcServiceClient := config.NewAuthorGrpcServiceClient()
 
 	// migrations
 	err := gormDB.AutoMigrate(
@@ -43,13 +44,14 @@ func main() {
 	}
 
 	// repositories
-	authRepo := repository.NewAuthRepo(authGrpcServiceClient)
-	authorRepo := repository.NewAuthorRepo(gormDB)
+	// authRepo := repository.NewAuthRepo(authGrpcServiceClient)
+	authorRepo := repository.NewAuthorRepo(authorGrpcServiceClient)
+	bookRepo := repository.NewBookRepo(gormDB)
 
 	// ucases
-	authorUcase := ucase.NewAuthorUcase(authorRepo, authRepo)
+	bookUcase := ucase.NewBookUcase(bookRepo, authorRepo)
 	dependencies := interface_pkg.CommonDependency{
-		AuthorUcase: authorUcase,
+		BookUcase: bookUcase,
 	}
 
 	args := os.Args

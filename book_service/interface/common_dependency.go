@@ -5,5 +5,5 @@ import (
 )
 
 type CommonDependency struct {
-	AuthorUcase ucase.IAuthorUcase
+	BookUcase ucase.IBookUcase
 }
