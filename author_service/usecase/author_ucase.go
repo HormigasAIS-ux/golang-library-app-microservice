@@ -37,6 +37,9 @@ type IAuthorUcase interface {
 	GetList(
 		ctx *gin.Context, query dto.GetAuthorListReq,
 	) ([]dto.GetAuthorListRespDataItem, int64, error)
+	GetAuthorByUserUUID(
+		ctx context.Context, userUUID string,
+	) (*dto.GetAuthorByUserUUIDRespData, error)
 }
 
 func NewAuthorUcase(
@@ -555,4 +558,33 @@ func (u *AuthorUcase) GetList(
 	}
 
 	return respItems, count, nil
+}
+
+func (u *AuthorUcase) GetAuthorByUserUUID(
+	ctx context.Context, userUUID string,
+) (*dto.GetAuthorByUserUUIDRespData, error) {
+	author, err := u.authorRepo.GetByUserUUID(userUUID)
+	if err != nil {
+		if err.Error() == "not found" {
+			logger.Errorf("author not found: %s", userUUID)
+			return nil, &error_utils.CustomErr{
+				HttpCode: 404,
+				GrpcCode: codes.NotFound,
+				Message:  "author not found",
+				Detail:   err.Error(),
+			}
+		}
+		logger.Errorf("error getting author by user uuid: %s", userUUID)
+		return nil, err
+	}
+
+	return &dto.GetAuthorByUserUUIDRespData{
+		UUID:      author.UUID,
+		CreatedAt: author.CreatedAt,
+		UpdatedAt: author.UpdatedAt,
+		FirstName: author.FirstName,
+		LastName:  author.LastName,
+		BirthDate: author.BirthDate,
+		Bio:       author.Bio,
+	}, nil
 }

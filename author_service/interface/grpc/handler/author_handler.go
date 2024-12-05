@@ -91,3 +91,42 @@ func (r *AuthorServiceHandler) CreateAuthor(
 
 	return resp, nil
 }
+
+func (r *AuthorServiceHandler) GetUserByUUID(
+	ctx context.Context,
+	in *author_pb.GetAuthorByUserUUIDReq,
+) (*author_pb.GetAuthorByUserUUIDResp, error) {
+	if in.UserUuid == "" {
+		logger.Errorf("invalid request: missing user_uuid")
+		return nil, status.Error(codes.InvalidArgument, "user uuid is required")
+	}
+
+	raw, err := r.authorUcase.GetAuthorByUserUUID(ctx, in.UserUuid)
+	if err != nil {
+		customErr, ok := err.(*error_utils.CustomErr)
+		if ok {
+			return nil, status.Errorf(customErr.GrpcCode, customErr.Error())
+		}
+		return nil, status.Errorf(codes.Internal, err.Error())
+	}
+
+	resp := &author_pb.GetAuthorByUserUUIDResp{
+		Uuid:      raw.UUID.String(),
+		UserUuid:  raw.UserUUID.String(),
+		FirstName: raw.FirstName,
+		LastName:  raw.LastName,
+	}
+	if raw.BirthDate != nil {
+		resp.BirthDate = *raw.BirthDate
+	} else {
+		resp.BirthDate = ""
+	}
+
+	if raw.Bio != nil {
+		resp.Bio = *raw.Bio
+	} else {
+		resp.Bio = ""
+	}
+
+	return resp, nil
+}

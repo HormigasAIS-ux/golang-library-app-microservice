@@ -119,3 +119,14 @@ type GetAuthorDetailRespData struct {
 	Role      string    `json:"role"`
 	BookTotal int64     `json:"book_total"`
 }
+
+type GetAuthorByUserUUIDRespData struct {
+	UUID      uuid.UUID `json:"uuid"`
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
+	UserUUID  uuid.UUID `json:"user_uuid"`
+	FirstName string    `json:"first_name"`
+	LastName  string    `json:"last_name"`
+	BirthDate *string   `json:"birth_date"`
+	Bio       *string   `json:"bio"`
+}
