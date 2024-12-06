@@ -2,7 +2,7 @@
 
 ### Key Features
 1. **Role-Based Access Control (RBAC)**
-Provides fine-grained access control for different user roles (e.g., Admin, Librarian, Member).
+Provides fine-grained access control for different user roles (e.g., Admin, User).
 Ensures that only authorized users can perform specific operations on the system.
 2. **Authentication and Authorization**
 Utilizes JWT (JSON Web Tokens) for secure and stateless authentication.
