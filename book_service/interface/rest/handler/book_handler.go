@@ -3,6 +3,7 @@ package rest_handler
 import (
 	"book_service/domain/dto"
 	ucase "book_service/usecase"
+	"book_service/utils/helper"
 	"book_service/utils/http_response"
 
 	"github.com/gin-gonic/gin"
@@ -18,6 +19,7 @@ type BookHandler struct {
 
 type IBookHandler interface {
 	Create(ctx *gin.Context)
+	PatchBook(ctx *gin.Context)
 }
 
 func NewBookHandler(
@@ -30,7 +32,7 @@ func NewBookHandler(
 	}
 }
 
-// @Summary Create new author
+// @Summary Create new book
 // @Router /books [post]
 // @Tags Books
 // @Param payload body dto.CreateBookReq true "payload"
@@ -44,25 +46,48 @@ func (handler *BookHandler) Create(ctx *gin.Context) {
 		return
 	}
 
-	// get current user
-	rawCurrentUser, ok := ctx.Get("currentUser")
-	if !ok {
-		logger.Errorf("invalid currentUser: %v", rawCurrentUser)
-		handler.respWriter.HTTPJson(ctx, 500, "internal server error", nil, nil)
-		return
-	}
-	currentUser, ok := rawCurrentUser.(dto.CurrentUser)
-	if !ok {
-		logger.Errorf("invalid currentUser: %v", rawCurrentUser)
-		handler.respWriter.HTTPJson(ctx, 500, "internal server error", nil, nil)
+	currentUser, err := helper.GetCurrentUserFromGinCtx(ctx)
+	if err != nil {
+		handler.respWriter.HTTPCustomErr(ctx, err)
 		return
 	}
 
-	resp, err := handler.bookUcase.Create(ctx, currentUser, payload)
+	resp, err := handler.bookUcase.Create(ctx, *currentUser, payload)
 	if err != nil {
 		handler.respWriter.HTTPCustomErr(ctx, err)
 		return
 	}
 
 	handler.respWriter.HTTPJsonOK(ctx, resp)
+}
+
+// @Summary patch book
+// @Router /books/{book_uuid} [book]
+// @Tags Books
+// @Param payload body dto.PatchBookReq true "payload"
+// @Success 200 {object} dto.BaseJSONResp{data=dto.PatchBookRespData}
+// @Security BearerAuth
+func (handler *BookHandler) PatchBook(ctx *gin.Context) {
+	bookUUID := ctx.Param("book_uuid")
+
+	var payload dto.PatchBookReq
+	if err := ctx.ShouldBindJSON(&payload); err != nil {
+		logger.Errorf("invalid payload: %v", err)
+		handler.respWriter.HTTPJson(ctx, 400, "invalid payload", err.Error(), nil)
+		return
+	}
+
+	currentUser, err := helper.GetCurrentUserFromGinCtx(ctx)
+	if err != nil {
+		handler.respWriter.HTTPCustomErr(ctx, err)
+		return
+	}
+
+	data, err := handler.bookUcase.PatchBook(ctx, *currentUser, bookUUID, payload)
+	if err != nil {
+		handler.respWriter.HTTPCustomErr(ctx, err)
+		return
+	}
+
+	handler.respWriter.HTTPJsonOK(ctx, data)
 }

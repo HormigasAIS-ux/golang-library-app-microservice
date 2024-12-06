@@ -22,6 +22,12 @@ type BookUcase struct {
 
 type IBookUcase interface {
 	Create(ctx context.Context, currentUser dto.CurrentUser, payload dto.CreateBookReq) (*dto.CreateBookResp, error)
+	PatchBook(
+		ctx context.Context,
+		currentUser dto.CurrentUser,
+		bookUUID string,
+		payload dto.PatchBookReq,
+	) (*dto.PatchBookRespData, error)
 }
 
 func NewBookUcase(
@@ -122,5 +128,93 @@ func (ucase *BookUcase) Create(ctx context.Context, currentUser dto.CurrentUser,
 		Stock:     newBook.Stock,
 		CreatedAt: newBook.CreatedAt,
 		UpdatedAt: newBook.UpdatedAt,
+	}, nil
+}
+
+func (ucase *BookUcase) PatchBook(
+	ctx context.Context,
+	currentUser dto.CurrentUser,
+	bookUUID string,
+	payload dto.PatchBookReq,
+) (*dto.PatchBookRespData, error) {
+	// find book
+	book, err := ucase.bookRepo.GetByUUID(bookUUID)
+	if err != nil {
+		if err.Error() == "not found" {
+			logger.Errorf("err: %v", err)
+			return nil, &error_utils.CustomErr{
+				HttpCode: 404,
+				GrpcCode: codes.NotFound,
+				Message:  "not found",
+				Detail:   err,
+			}
+		} else {
+			logger.Errorf("err: %v", err)
+			return nil, &error_utils.CustomErr{
+				HttpCode: 500,
+				GrpcCode: codes.Internal,
+				Message:  "internal server error",
+				Detail:   err,
+			}
+		}
+	}
+
+	// validate user
+	if book.AuthorUUID.String() != currentUser.UUID {
+		logger.Errorf("err: %v", err)
+		return nil, &error_utils.CustomErr{
+			HttpCode: 403,
+			GrpcCode: codes.PermissionDenied,
+			Message:  "forbidden",
+			Detail:   "forbidden",
+		}
+	}
+
+	if payload.CategoryUUID != nil {
+		// TODO: validate category through category service
+
+		noValue := "no value"
+		if payload.CategoryUUID == &noValue {
+			book.CategoryUUID = nil
+		} else {
+			tmp, _ := uuid.Parse(*payload.CategoryUUID)
+			book.CategoryUUID = &tmp
+		}
+	}
+
+	if payload.Title != nil {
+		book.Title = *payload.Title
+	}
+
+	if payload.Stock != nil {
+		book.Stock = *payload.Stock
+	}
+
+	// update book
+	err = ucase.bookRepo.Update(book)
+	if err != nil {
+		logger.Errorf("err: %v", err)
+		return nil, &error_utils.CustomErr{
+			HttpCode: 500,
+			GrpcCode: codes.Internal,
+			Message:  "internal server error",
+			Detail:   err.Error(),
+		}
+	}
+
+	return &dto.PatchBookRespData{
+		UUID:       book.UUID.String(),
+		AuthorUUID: book.AuthorUUID.String(),
+		CategoryUUID: func() *string {
+			if book.CategoryUUID == nil {
+				return nil
+			}
+			tmp := book.CategoryUUID.String()
+			return &tmp
+		}(),
+		Title:     book.Title,
+		Stock:     book.Stock,
+		CreatedAt: book.CreatedAt,
+		UpdatedAt: book.UpdatedAt,
 	}, nil
 }

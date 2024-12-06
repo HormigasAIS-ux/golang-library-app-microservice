@@ -49,7 +49,7 @@ func (repo *BookRepo) GetByUUID(uuid string) (*model.Book, error) {
 		if err == gorm.ErrRecordNotFound {
 			return nil, errors.New("not found")
 		}
-		return nil, errors.New("failed to get book")
+		return nil, errors.New("failed to get")
 	}
 	return &book, nil
 }

@@ -138,3 +138,20 @@ type CreateBookResp struct {
 	CreatedAt    time.Time `json:"created_at"`
 	UpdatedAt    time.Time `json:"updated_at"`
 }
+
+// use "no value" to set nullable field to nil
+type PatchBookReq struct {
+	CategoryUUID *string `json:"category_uuid"`
+	Title        *string `json:"title"`
+	Stock        *int64  `json:"stock"`
+}
+
+type PatchBookRespData struct {
+	UUID         string    `json:"uuid"`
+	AuthorUUID   string    `json:"author_uuid"`
+	CategoryUUID *string   `json:"category_uuid"`
+	Title        string    `json:"title"`
+	Stock        int64     `json:"stock"`
+	UpdatedAt    time.Time `json:"updated_at"`
+	CreatedAt    time.Time `json:"created_at"`
+}

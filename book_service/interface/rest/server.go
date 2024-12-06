@@ -50,6 +50,7 @@ func SetupServer(commonDependencies interface_pkg.CommonDependency) {
 		bookRouter := secureRouter.Group("/books")
 		{
 			bookRouter.POST("", bookHandler.Create)
+			bookRouter.PATCH("/:book_uuid", bookHandler.PatchBook)
 		}
 	}
 
