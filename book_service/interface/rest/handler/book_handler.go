@@ -62,7 +62,7 @@ func (handler *BookHandler) Create(ctx *gin.Context) {
 }
 
 // @Summary patch book
-// @Router /books/{book_uuid} [book]
+// @Router /books/{book_uuid} [patch]
 // @Tags Books
 // @Param payload body dto.PatchBookReq true "payload"
 // @Success 200 {object} dto.BaseJSONResp{data=dto.PatchBookRespData}

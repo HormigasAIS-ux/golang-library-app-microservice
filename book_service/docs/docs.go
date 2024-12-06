@@ -25,7 +25,7 @@ const docTemplate = `{
                 "tags": [
                     "Books"
                 ],
-                "summary": "Create new author",
+                "summary": "Create new book",
                 "parameters": [
                     {
                         "description": "payload",
@@ -50,6 +50,50 @@ const docTemplate = `{
                                     "properties": {
                                         "data": {
                                             "$ref": "#/definitions/dto.CreateBookResp"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/books/{book_uuid}": {
+            "patch": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "tags": [
+                    "Books"
+                ],
+                "summary": "patch book",
+                "parameters": [
+                    {
+                        "description": "payload",
+                        "name": "payload",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.PatchBookReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/dto.BaseJSONResp"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/dto.PatchBookRespData"
                                         }
                                     }
                                 }
@@ -93,6 +137,46 @@ const docTemplate = `{
             }
         },
         "dto.CreateBookResp": {
+            "type": "object",
+            "properties": {
+                "author_uuid": {
+                    "type": "string"
+                },
+                "category_uuid": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "stock": {
+                    "type": "integer"
+                },
+                "title": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                },
+                "uuid": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.PatchBookReq": {
+            "type": "object",
+            "properties": {
+                "category_uuid": {
+                    "type": "string"
+                },
+                "stock": {
+                    "type": "integer"
+                },
+                "title": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.PatchBookRespData": {
             "type": "object",
             "properties": {
                 "author_uuid": {

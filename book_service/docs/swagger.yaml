@@ -37,6 +37,32 @@ definitions:
       uuid:
         type: string
     type: object
+  dto.PatchBookReq:
+    properties:
+      category_uuid:
+        type: string
+      stock:
+        type: integer
+      title:
+        type: string
+    type: object
+  dto.PatchBookRespData:
+    properties:
+      author_uuid:
+        type: string
+      category_uuid:
+        type: string
+      created_at:
+        type: string
+      stock:
+        type: integer
+      title:
+        type: string
+      updated_at:
+        type: string
+      uuid:
+        type: string
+    type: object
 info:
   contact: {}
   title: Book Service RESTful API
@@ -62,7 +88,31 @@ paths:
               type: object
       security:
       - BearerAuth: []
-      summary: Create new author
+      summary: Create new book
+      tags:
+      - Books
+  /books/{book_uuid}:
+    patch:
+      parameters:
+      - description: payload
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/dto.PatchBookReq'
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/dto.BaseJSONResp'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.PatchBookRespData'
+              type: object
+      security:
+      - BearerAuth: []
+      summary: patch book
       tags:
       - Books
 securityDefinitions:
