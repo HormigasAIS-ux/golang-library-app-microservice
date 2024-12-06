@@ -4,7 +4,7 @@ import (
 	"auth_service/config"
 	"auth_service/domain/dto"
 	"auth_service/domain/model"
-	author_pb "auth_service/interface/grpc/genproto/author"
+	author_grpc "auth_service/interface/grpc/genproto/author"
 	"auth_service/repository"
 	bcrypt_util "auth_service/utils/bcrypt"
 	error_utils "auth_service/utils/error"
@@ -104,7 +104,7 @@ func (s *AuthUcase) Register(ctx *gin.Context, payload dto.RegisterUserReq) (*dt
 	// create author through author service
 	_, grpcCode, err := s.authorRepo.RpcCreateAuthor(
 		ctx,
-		&author_pb.CreateAuthorReq{
+		&author_grpc.CreateAuthorReq{
 			FirstName: payload.Username,
 			LastName:  "",
 			BirthDate: "",

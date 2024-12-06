@@ -4,7 +4,7 @@
 // - protoc             v5.29.0
 // source: book.proto
 
-package book
+package book_grpc
 
 import (
 	context "context"

@@ -1,7 +1,7 @@
 syntax = "proto3";
 
 package author_service;
-option go_package = "author_service/interface/grpc/genproto/author_grpc";
+option go_package = "/author_grpc";
 
 service AuthorService {
     rpc CreateAuthor(CreateAuthorReq) returns (CreateAuthorResp);

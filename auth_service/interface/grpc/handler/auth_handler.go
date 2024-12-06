@@ -2,7 +2,7 @@ package handler
 
 import (
 	"auth_service/domain/dto"
-	"auth_service/interface/grpc/genproto/auth"
+	auth_grpc "auth_service/interface/grpc/genproto/auth"
 	ucase "auth_service/usecase"
 	error_utils "auth_service/utils/error"
 	"context"
@@ -12,7 +12,7 @@ import (
 )
 
 type AuthServiceHandler struct {
-	auth.UnimplementedAuthServiceServer
+	auth_grpc.UnimplementedAuthServiceServer
 	authUcase ucase.IAuthUcase
 	userUcase ucase.IUserUcase
 }
@@ -21,7 +21,7 @@ func NewAuthServiceHandler(authUcase ucase.IAuthUcase, userUcase ucase.IUserUcas
 	return &AuthServiceHandler{authUcase: authUcase, userUcase: userUcase}
 }
 
-func (h *AuthServiceHandler) CheckToken(ctx context.Context, req *auth.CheckTokenRequest) (*auth.CheckTokenResponse, error) {
+func (h *AuthServiceHandler) CheckToken(ctx context.Context, req *auth_grpc.CheckTokenRequest) (*auth_grpc.CheckTokenResponse, error) {
 	// payload validation
 	payload := dto.CheckTokenReq{
 		AccessToken: req.AccessToken,
@@ -39,7 +39,7 @@ func (h *AuthServiceHandler) CheckToken(ctx context.Context, req *auth.CheckToke
 		return nil, status.Errorf(codes.Internal, err.Error())
 	}
 
-	resp := &auth.CheckTokenResponse{
+	resp := &auth_grpc.CheckTokenResponse{
 		Uuid:     raw.UUID,
 		Username: raw.Username,
 		Email:    raw.Email,
@@ -51,8 +51,8 @@ func (h *AuthServiceHandler) CheckToken(ctx context.Context, req *auth.CheckToke
 
 func (h *AuthServiceHandler) GetUserByUUID(
 	ctx context.Context,
-	req *auth.GetUserByUUIDRequest,
-) (*auth.GetUserByUUIDResponse, error) {
+	req *auth_grpc.GetUserByUUIDRequest,
+) (*auth_grpc.GetUserByUUIDResponse, error) {
 	// payload validation
 	if req.Uuid == "" {
 		return nil, status.Error(codes.InvalidArgument, "missing uuid")
@@ -67,7 +67,7 @@ func (h *AuthServiceHandler) GetUserByUUID(
 		return nil, status.Errorf(codes.Internal, err.Error())
 	}
 
-	resp := &auth.GetUserByUUIDResponse{
+	resp := &auth_grpc.GetUserByUUIDResponse{
 		Uuid:     raw.UUID,
 		Username: raw.Username,
 		Email:    raw.Email,
@@ -79,8 +79,8 @@ func (h *AuthServiceHandler) GetUserByUUID(
 
 func (h *AuthServiceHandler) CreateUser(
 	ctx context.Context,
-	req *auth.CreateUserReq,
-) (*auth.CreateUserResp, error) {
+	req *auth_grpc.CreateUserReq,
+) (*auth_grpc.CreateUserResp, error) {
 	// payload validation
 	if req.Username == "" ||
 		req.Email == "" ||
@@ -103,7 +103,7 @@ func (h *AuthServiceHandler) CreateUser(
 		return nil, status.Errorf(codes.Internal, err.Error())
 	}
 
-	resp := &auth.CreateUserResp{
+	resp := &auth_grpc.CreateUserResp{
 		Uuid:     raw.UUID,
 		Username: raw.Username,
 		Email:    raw.Email,
@@ -115,8 +115,8 @@ func (h *AuthServiceHandler) CreateUser(
 
 func (h *AuthServiceHandler) UpdateUser(
 	ctx context.Context,
-	req *auth.UpdateUserReq,
-) (*auth.UpdateUserResp, error) {
+	req *auth_grpc.UpdateUserReq,
+) (*auth_grpc.UpdateUserResp, error) {
 	// payload validation
 	if req.Uuid == "" {
 		return nil, status.Error(codes.InvalidArgument, "missing uuid")
@@ -154,7 +154,7 @@ func (h *AuthServiceHandler) UpdateUser(
 		return nil, status.Errorf(codes.Internal, err.Error())
 	}
 
-	resp := &auth.UpdateUserResp{
+	resp := &auth_grpc.UpdateUserResp{
 		Uuid:     raw.UUID,
 		Username: raw.Username,
 		Email:    raw.Email,
@@ -166,8 +166,8 @@ func (h *AuthServiceHandler) UpdateUser(
 
 func (h *AuthServiceHandler) DeleteUser(
 	ctx context.Context,
-	req *auth.DeleteUserReq,
-) (*auth.DeleteUserResp, error) {
+	req *auth_grpc.DeleteUserReq,
+) (*auth_grpc.DeleteUserResp, error) {
 	// payload validation
 	if req.Uuid == "" {
 		return nil, status.Error(codes.InvalidArgument, "missing uuid")
@@ -182,7 +182,7 @@ func (h *AuthServiceHandler) DeleteUser(
 		return nil, status.Errorf(codes.Internal, err.Error())
 	}
 
-	resp := &auth.DeleteUserResp{
+	resp := &auth_grpc.DeleteUserResp{
 		Uuid:     raw.UUID,
 		Username: raw.Username,
 		Email:    raw.Email,
