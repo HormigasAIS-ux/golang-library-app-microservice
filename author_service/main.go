@@ -5,8 +5,6 @@ import (
 	"author_service/domain/model"
 	interface_pkg "author_service/interface"
 	"author_service/interface/grpc"
-	auth_grpc "author_service/interface/grpc/genproto/auth"
-	book_grpc "author_service/interface/grpc/genproto/book"
 	"author_service/interface/rest"
 	"author_service/repository"
 	ucase "author_service/usecase"
@@ -33,9 +31,8 @@ var logger = logging.MustGetLogger("main")
 func main() {
 	logger.Debugf("Envs: %v", helper.PrettyJson(config.Envs))
 	gormDB := config.NewPostgresqlDB()
-	grpcConn := config.NewGrpcConnection()
-	authGrpcServiceClient := auth_grpc.NewAuthServiceClient(grpcConn)
-	bookGrpcServiceClient := book_grpc.NewBookServiceClient(grpcConn)
+	authGrpcServiceClient := config.NewAuthGrpcServiceClient()
+	bookGrpcServiceClient := config.NewBookGrpcServiceClient()
 
 	// migrations
 	err := gormDB.AutoMigrate(
