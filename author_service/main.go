@@ -5,6 +5,8 @@ import (
 	"author_service/domain/model"
 	interface_pkg "author_service/interface"
 	"author_service/interface/grpc"
+	auth_grpc "author_service/interface/grpc/genproto/auth"
+	book_grpc "author_service/interface/grpc/genproto/book"
 	"author_service/interface/rest"
 	"author_service/repository"
 	ucase "author_service/usecase"
@@ -31,7 +33,9 @@ var logger = logging.MustGetLogger("main")
 func main() {
 	logger.Debugf("Envs: %v", helper.PrettyJson(config.Envs))
 	gormDB := config.NewPostgresqlDB()
-	authGrpcServiceClient := config.NewAuthGrpcServiceClient()
+	grpcConn := config.NewGrpcConnection()
+	authGrpcServiceClient := auth_grpc.NewAuthServiceClient(grpcConn)
+	bookGrpcServiceClient := book_grpc.NewBookServiceClient(grpcConn)
 
 	// migrations
 	err := gormDB.AutoMigrate(
@@ -45,7 +49,7 @@ func main() {
 	authorRepo := repository.NewAuthorRepo(gormDB)
 
 	// ucases
-	authorUcase := ucase.NewAuthorUcase(authorRepo, authGrpcServiceClient)
+	authorUcase := ucase.NewAuthorUcase(authorRepo, authGrpcServiceClient, bookGrpcServiceClient)
 	dependencies := interface_pkg.CommonDependency{
 		AuthorUcase: authorUcase,
 	}

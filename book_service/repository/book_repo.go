@@ -3,7 +3,6 @@ package repository
 import (
 	"book_service/domain/dto"
 	"book_service/domain/model"
-	"context"
 	"errors"
 	"fmt"
 
@@ -20,11 +19,9 @@ type IBookRepo interface {
 	Update(book *model.Book) error
 	Delete(id string) error
 	GetList(
-		ctx context.Context,
 		params dto.BookRepo_GetListParams,
 	) ([]model.Book, error)
 	CountGetList(
-		ctx context.Context,
 		params dto.BookRepo_GetListParams,
 	) (int64, error)
 }
@@ -71,7 +68,6 @@ func (repo *BookRepo) Delete(id string) error {
 }
 
 func (repo *BookRepo) GetList(
-	ctx context.Context,
 	params dto.BookRepo_GetListParams,
 ) ([]model.Book, error) {
 	// validate param
@@ -84,7 +80,11 @@ func (repo *BookRepo) GetList(
 	tx := repo.db.Model(&models)
 
 	if params.AuthorUUID != "" {
-		tx = tx.Where("author_uuid = ?", params.AuthorUUID)
+		if params.AuthorUUID == "null" {
+			tx = tx.Where("author_uuid IS NULL")
+		} else {
+			tx = tx.Where("author_uuid = ?", params.AuthorUUID)
+		}
 	}
 
 	if params.Query != "" {
@@ -118,13 +118,16 @@ func (repo *BookRepo) GetList(
 }
 
 func (repo *BookRepo) CountGetList(
-	ctx context.Context,
 	params dto.BookRepo_GetListParams,
 ) (int64, error) {
 	tx := repo.db.Model(&model.Book{})
 
 	if params.AuthorUUID != "" {
-		tx = tx.Where("author_uuid = ?", params.AuthorUUID)
+		if params.AuthorUUID == "null" {
+			tx = tx.Where("author_uuid IS NULL")
+		} else {
+			tx = tx.Where("author_uuid = ?", params.AuthorUUID)
+		}
 	}
 
 	if params.Query != "" {

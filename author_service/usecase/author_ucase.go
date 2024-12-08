@@ -21,6 +21,7 @@ var logger = logging.MustGetLogger("main")
 type AuthorUcase struct {
 	authorRepo            repository.IAuthorRepo
 	authGrpcServiceClient auth_pb.AuthServiceClient
+	bookGrpcServiceClient book_pb.BookServiceClient
 }
 
 type IAuthorUcase interface {
@@ -46,10 +47,12 @@ type IAuthorUcase interface {
 func NewAuthorUcase(
 	authorRepo repository.IAuthorRepo,
 	authGrpcServiceClient auth_pb.AuthServiceClient,
+	bookGrpcServiceClient book_pb.BookServiceClient,
 ) IAuthorUcase {
 	return &AuthorUcase{
 		authorRepo:            authorRepo,
 		authGrpcServiceClient: authGrpcServiceClient,
+		bookGrpcServiceClient: bookGrpcServiceClient,
 	}
 }
 
@@ -484,8 +487,22 @@ func (u *AuthorUcase) GetAuthorDetail(ctx *gin.Context, authorUUID string) (*dto
 		}
 	}
 
-	// TODO: get book total by author uuid through book service
-	bookTotalResp := book_pb.GetBookTotalByAuthorUUIDResp{}
+	resp, err := u.bookGrpcServiceClient.GetBookTotalByAuthorUUID(
+		ctx,
+		&book_pb.GetBookTotalByAuthorUUIDReq{
+			AuthorUuid: author.UUID.String(),
+		},
+	)
+	code := status.Code(err)
+	if code != codes.OK || err != nil {
+		logger.Errorf("failed to get book total by author uuid: %v", err)
+		return nil, &error_utils.CustomErr{
+			HttpCode: 500,
+			GrpcCode: codes.Internal,
+			Message:  "internal server error",
+			Detail:   err,
+		}
+	}
 
 	respData := &dto.GetAuthorDetailRespData{
 		UUID:      author.UUID,
@@ -499,7 +516,7 @@ func (u *AuthorUcase) GetAuthorDetail(ctx *gin.Context, authorUUID string) (*dto
 		BirthDate: author.BirthDate,
 		Bio:       author.Bio,
 		Role:      getUserResp.Role,
-		BookTotal: bookTotalResp.BookTotal,
+		BookTotal: resp.BookTotal,
 	}
 
 	return respData, nil
@@ -534,19 +551,36 @@ func (u *AuthorUcase) GetList(
 		return nil, 0, err
 	}
 
-	// TODO: get bulk book total by author uuid through book service
-	bookTotalResp := book_pb.BulkGetBookTotalByAuthorUUIDsResp{}
-	bookTotalByAuthorUUID := make(map[string]int64)
+	resp, err := u.bookGrpcServiceClient.BulkGetBookTotalByAuthorUUIDs(
+		ctx,
+		&book_pb.BulkGetBookTotalByAuthorUUIDsReq{
+			AuthorUuids: []string{},
+		},
+	)
+	code := status.Code(err)
+	if code != codes.OK || err != nil {
+		logger.Warningf("failed to get book total by author uuids: %v", err)
+	}
 
-	if bookTotalResp.Data != nil {
-		for _, item := range bookTotalResp.Data {
-			bookTotalByAuthorUUID[item.AuthorUuid] = item.BookTotal
+	bookTotalMapByAuthorUUID := make(map[string]int64)
+
+	if resp != nil {
+		if resp.Data != nil {
+			for _, item := range resp.Data {
+				if item != nil {
+					if item.AuthorUuid == "" {
+						logger.Warningf("failed to get book total; author uuid is empty; skip")
+						continue
+					}
+					bookTotalMapByAuthorUUID[item.AuthorUuid] = item.BookTotal
+				}
+			}
 		}
 	}
 
 	respItems := make([]dto.GetAuthorListRespDataItem, 0)
 	for _, v := range data {
-		bookTotal, ok := bookTotalByAuthorUUID[v.UUID.String()]
+		bookTotal, ok := bookTotalMapByAuthorUUID[v.UUID.String()]
 		if !ok {
 			logger.Warningf("book total not found for author uuid: %s; set to 0", v.UUID.String())
 			bookTotal = 0

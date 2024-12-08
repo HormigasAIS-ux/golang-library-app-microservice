@@ -14,7 +14,7 @@ type GetBookListReq struct {
 }
 
 type BookRepo_GetListParams struct {
-	AuthorUUID string
+	AuthorUUID string // use string "null" to query null field
 	Query      string
 	QueryBy    string
 	Page       int
@@ -64,4 +64,13 @@ type DeleteBookRespData struct {
 	Stock        int64     `json:"stock"`
 	UpdatedAt    time.Time `json:"updated_at"`
 	CreatedAt    time.Time `json:"created_at"`
+}
+
+type BulkGetBookTotalByAuthorUUIDsReq struct {
+	AuthorUUIDs []string `json:"author_uuids" binding:"required"`
+}
+
+type BulkGetBookTotalByAuthorUUIDsRespDataItem struct {
+	AuthorUUID string `json:"author_uuid"`
+	Total      int64  `json:"total"`
 }

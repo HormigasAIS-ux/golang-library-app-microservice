@@ -34,6 +34,11 @@ type IBookUcase interface {
 		currentUser dto.CurrentUser,
 		bookUUID string,
 	) (*dto.DeleteBookRespData, error)
+	GetBookTotalByAuthorUUID(ctx context.Context, authorUUID string) (int64, error)
+	BulkGetBookTotalByAuthorUUIDs(
+		ctx context.Context,
+		payload dto.BulkGetBookTotalByAuthorUUIDsReq,
+	) ([]dto.BulkGetBookTotalByAuthorUUIDsRespDataItem, error)
 }
 
 func NewBookUcase(
@@ -77,7 +82,7 @@ func (ucase *BookUcase) Create(ctx context.Context, currentUser dto.CurrentUser,
 
 	// check title exists by author uuid
 	if books, _ := ucase.bookRepo.GetList(
-		ctx, dto.BookRepo_GetListParams{
+		dto.BookRepo_GetListParams{
 			AuthorUUID: getAuthorResp.Uuid,
 			Query:      payload.Title,
 			QueryBy:    "title",
@@ -290,4 +295,59 @@ func (ucase *BookUcase) DeleteBook(
 		CreatedAt: book.CreatedAt,
 		UpdatedAt: book.UpdatedAt,
 	}, nil
+}
+
+func (ucase *BookUcase) GetBookTotalByAuthorUUID(
+	ctx context.Context,
+	authorUUID string,
+) (int64, error) {
+	if authorUUID == "" {
+		return 0, &error_utils.CustomErr{
+			HttpCode: 400,
+			GrpcCode: codes.InvalidArgument,
+			Message:  "invalid argument",
+			Detail:   "authorUUID is empty",
+		}
+	}
+
+	count, err := ucase.bookRepo.CountGetList(
+		dto.BookRepo_GetListParams{
+			AuthorUUID: authorUUID,
+		},
+	)
+	if err != nil {
+		logger.Errorf("err: %v", err)
+		return 0, &error_utils.CustomErr{
+			HttpCode: 500,
+			GrpcCode: codes.Internal,
+			Message:  "internal server error",
+			Detail:   err,
+		}
+	}
+
+	return count, nil
+}
+
+func (ucase *BookUcase) BulkGetBookTotalByAuthorUUIDs(
+	ctx context.Context,
+	payload dto.BulkGetBookTotalByAuthorUUIDsReq,
+) ([]dto.BulkGetBookTotalByAuthorUUIDsRespDataItem, error) {
+	var results []dto.BulkGetBookTotalByAuthorUUIDsRespDataItem
+	for _, authorUUID := range payload.AuthorUUIDs {
+		count, err := ucase.bookRepo.CountGetList(
+			dto.BookRepo_GetListParams{
+				AuthorUUID: authorUUID,
+			},
+		)
+		if err != nil {
+			logger.Warningf("err: %v", err)
+		}
+
+		results = append(results, dto.BulkGetBookTotalByAuthorUUIDsRespDataItem{
+			AuthorUUID: authorUUID,
+			Total:      count,
+		})
+	}
+
+	return results, nil
 }
