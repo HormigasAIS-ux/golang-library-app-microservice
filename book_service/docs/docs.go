@@ -60,6 +60,37 @@ const docTemplate = `{
             }
         },
         "/books/{book_uuid}": {
+            "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "tags": [
+                    "Books"
+                ],
+                "summary": "Delete Book",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/dto.BaseJSONResp"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/dto.DeleteBookRespData"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            },
             "patch": {
                 "security": [
                     {
@@ -137,6 +168,32 @@ const docTemplate = `{
             }
         },
         "dto.CreateBookResp": {
+            "type": "object",
+            "properties": {
+                "author_uuid": {
+                    "type": "string"
+                },
+                "category_uuid": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "stock": {
+                    "type": "integer"
+                },
+                "title": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                },
+                "uuid": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.DeleteBookRespData": {
             "type": "object",
             "properties": {
                 "author_uuid": {

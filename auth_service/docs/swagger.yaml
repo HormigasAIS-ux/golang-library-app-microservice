@@ -4,8 +4,7 @@ definitions:
       code:
         type: integer
       data: {}
-      detail:
-        type: string
+      detail: {}
       message:
         type: string
     type: object
@@ -20,7 +19,7 @@ definitions:
     properties:
       email:
         type: string
-      fullname:
+      role:
         type: string
       username:
         type: string
@@ -62,15 +61,12 @@ definitions:
     properties:
       email:
         type: string
-      fullname:
-        type: string
       password:
         type: string
       username:
         type: string
     required:
     - email
-    - fullname
     - password
     - username
     type: object

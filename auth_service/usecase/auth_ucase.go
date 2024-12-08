@@ -18,12 +18,13 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 type AuthUcase struct {
-	userRepo         repository.IUserRepo
-	refreshTokenRepo repository.IRefreshTokenRepo
-	authorRepo       repository.IAuthorRepo
+	userRepo                repository.IUserRepo
+	refreshTokenRepo        repository.IRefreshTokenRepo
+	authorGrpcServiceClient author_grpc.AuthorServiceClient
 }
 
 type IAuthUcase interface {
@@ -36,12 +37,12 @@ type IAuthUcase interface {
 func NewAuthUcase(
 	userRepo repository.IUserRepo,
 	refreshTokenRepo repository.IRefreshTokenRepo,
-	authorRepo repository.IAuthorRepo,
+	authorGrpcServiceClient author_grpc.AuthorServiceClient,
 ) IAuthUcase {
 	return &AuthUcase{
-		userRepo:         userRepo,
-		refreshTokenRepo: refreshTokenRepo,
-		authorRepo:       authorRepo,
+		userRepo:                userRepo,
+		refreshTokenRepo:        refreshTokenRepo,
+		authorGrpcServiceClient: authorGrpcServiceClient,
 	}
 }
 
@@ -102,15 +103,15 @@ func (s *AuthUcase) Register(ctx *gin.Context, payload dto.RegisterUserReq) (*dt
 	}
 
 	// create author through author service
-	_, grpcCode, err := s.authorRepo.RpcCreateAuthor(
-		ctx,
-		&author_grpc.CreateAuthorReq{
+	_, err = s.authorGrpcServiceClient.CreateAuthor(
+		ctx, &author_grpc.CreateAuthorReq{
 			FirstName: payload.Username,
 			LastName:  "",
 			BirthDate: "",
 			Bio:       "",
 		},
 	)
+	grpcCode := status.Code(err)
 
 	if grpcCode != codes.OK || err != nil {
 		logger.Errorf("error creating author: %v", err)

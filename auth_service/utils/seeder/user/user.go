@@ -12,11 +12,12 @@ import (
 	"github.com/google/uuid"
 	"github.com/op/go-logging"
 	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 var logger = logging.MustGetLogger("main")
 
-func SeedUser(userRepo repository.IUserRepo, authorRepo repository.IAuthorRepo) error {
+func SeedUser(userRepo repository.IUserRepo, authorGrpcServiceClient author_pb.AuthorServiceClient) error {
 	users := []model.User{}
 
 	if config.Envs.INITIAL_ADMIN_USERNAME != "" && config.Envs.INITIAL_ADMIN_PASSWORD != "" {
@@ -67,13 +68,15 @@ func SeedUser(userRepo repository.IUserRepo, authorRepo repository.IAuthorRepo) 
 			userUUID = existing.UUID.String()
 		}
 		logger.Debugf("userUUID: %s", userUUID)
-		createAuthorResp, grpcCode, err := authorRepo.RpcCreateAuthor(
+		createAuthorResp, err := authorGrpcServiceClient.CreateAuthor(
 			context.Background(),
 			&author_pb.CreateAuthorReq{
 				UserUuid:  userUUID,
 				FirstName: user.Username,
 			},
 		)
+
+		grpcCode := status.Code(err)
 
 		if grpcCode != codes.OK || err != nil {
 			logger.Warningf("failed to seed author: %s; error: %s", user.Username, err.Error())

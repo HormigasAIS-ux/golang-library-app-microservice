@@ -48,10 +48,9 @@ func main() {
 	// repositories
 	userRepo := repository.NewUserRepo(gormDB)
 	refreshTokenRepo := repository.NewRefreshTokenRepo(gormDB)
-	authorRepo := repository.NewAuthorRepo(authorGrpcServiceClient)
 
 	// ucases
-	authUcase := ucase.NewAuthUcase(userRepo, refreshTokenRepo, authorRepo)
+	authUcase := ucase.NewAuthUcase(userRepo, refreshTokenRepo, authorGrpcServiceClient)
 	userUcase := ucase.NewUserUcase(userRepo)
 
 	dependencies := interface_pkg.CommonDependency{
@@ -69,9 +68,7 @@ func main() {
 
 		// validate args
 		variables := validArgVariables
-		for _, preRunVariable := range validPreRunArgVariables {
-			variables = append(variables, preRunVariable)
-		}
+		variables = append(variables, validPreRunArgVariables...)
 		// logger.Debugf("variables: %v", variables)
 		for _, arg := range args[1:] {
 			valid := false
@@ -110,9 +107,7 @@ func main() {
 
 		// process args
 		variables = preArgs
-		for _, postArg := range postArgs {
-			variables = append(variables, postArg)
-		}
+		variables = append(variables, postArgs...)
 		for _, arg := range variables {
 			if strings.Contains(arg, fmt.Sprintf("--%s=", "server")) {
 				value := strings.Split(arg, "=")[1]
@@ -133,7 +128,7 @@ func main() {
 
 				switch value {
 				case "user":
-					err = seeder_util.SeedUser(userRepo, authorRepo)
+					err = seeder_util.SeedUser(userRepo, authorGrpcServiceClient)
 					if err != nil {
 						logger.Fatalf("failed to seed user: %v", err)
 					}

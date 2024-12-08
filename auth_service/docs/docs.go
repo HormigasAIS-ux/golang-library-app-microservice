@@ -178,9 +178,7 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "data": {},
-                "detail": {
-                    "type": "string"
-                },
+                "detail": {},
                 "message": {
                     "type": "string"
                 }
@@ -203,7 +201,7 @@ const docTemplate = `{
                 "email": {
                     "type": "string"
                 },
-                "fullname": {
+                "role": {
                     "type": "string"
                 },
                 "username": {
@@ -266,15 +264,11 @@ const docTemplate = `{
             "type": "object",
             "required": [
                 "email",
-                "fullname",
                 "password",
                 "username"
             ],
             "properties": {
                 "email": {
-                    "type": "string"
-                },
-                "fullname": {
                     "type": "string"
                 },
                 "password": {

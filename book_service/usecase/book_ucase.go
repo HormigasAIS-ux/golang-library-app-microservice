@@ -3,7 +3,7 @@ package ucase
 import (
 	"book_service/domain/dto"
 	"book_service/domain/model"
-	author_pb "book_service/interface/grpc/genproto/author"
+	author_grpc "book_service/interface/grpc/genproto/author"
 	"book_service/repository"
 	error_utils "book_service/utils/error"
 	"context"
@@ -11,13 +11,14 @@ import (
 	"github.com/google/uuid"
 	"github.com/op/go-logging"
 	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 var logger = logging.MustGetLogger("main")
 
 type BookUcase struct {
-	bookRepo   repository.IBookRepo
-	authorRepo repository.IAuthorRepo
+	bookRepo                repository.IBookRepo
+	authorGrpcServiceClient author_grpc.AuthorServiceClient
 }
 
 type IBookUcase interface {
@@ -28,25 +29,32 @@ type IBookUcase interface {
 		bookUUID string,
 		payload dto.PatchBookReq,
 	) (*dto.PatchBookRespData, error)
+	DeleteBook(
+		ctx context.Context,
+		currentUser dto.CurrentUser,
+		bookUUID string,
+	) (*dto.DeleteBookRespData, error)
 }
 
 func NewBookUcase(
 	bookRepo repository.IBookRepo,
-	authorRepo repository.IAuthorRepo,
+	authorGrpcServiceClient author_grpc.AuthorServiceClient,
 ) IBookUcase {
 	return &BookUcase{
-		bookRepo:   bookRepo,
-		authorRepo: authorRepo,
+		bookRepo:                bookRepo,
+		authorGrpcServiceClient: authorGrpcServiceClient,
 	}
 }
 
 func (ucase *BookUcase) Create(ctx context.Context, currentUser dto.CurrentUser, payload dto.CreateBookReq) (*dto.CreateBookResp, error) {
 	// get author by user uuid through author service
-	getAuthorResp, grpcCode, err := ucase.authorRepo.RpcCreateAuthor(
-		ctx, &author_pb.CreateAuthorReq{
+	getAuthorResp, err := ucase.authorGrpcServiceClient.GetAuthorByUserUUID(
+		ctx, &author_grpc.GetAuthorByUserUUIDReq{
 			UserUuid: currentUser.UUID,
 		},
 	)
+
+	grpcCode := status.Code(err)
 
 	if grpcCode != codes.OK {
 		logger.Debugf("grpcCode: %v;\nerr: %v", grpcCode, err)
@@ -68,7 +76,7 @@ func (ucase *BookUcase) Create(ctx context.Context, currentUser dto.CurrentUser,
 	}
 
 	// check title exists by author uuid
-	books, err := ucase.bookRepo.GetList(
+	if books, _ := ucase.bookRepo.GetList(
 		ctx, dto.BookRepo_GetListParams{
 			AuthorUUID: getAuthorResp.Uuid,
 			Query:      payload.Title,
@@ -76,9 +84,7 @@ func (ucase *BookUcase) Create(ctx context.Context, currentUser dto.CurrentUser,
 			Limit:      1,
 			Page:       1,
 		},
-	)
-
-	if len(books) > 0 {
+	); len(books) > 0 {
 		return nil, &error_utils.CustomErr{
 			HttpCode: 400,
 			GrpcCode: codes.AlreadyExists,
@@ -203,6 +209,73 @@ func (ucase *BookUcase) PatchBook(
 	}
 
 	return &dto.PatchBookRespData{
+		UUID:       book.UUID.String(),
+		AuthorUUID: book.AuthorUUID.String(),
+		CategoryUUID: func() *string {
+			if book.CategoryUUID == nil {
+				return nil
+			}
+			tmp := book.CategoryUUID.String()
+			return &tmp
+		}(),
+		Title:     book.Title,
+		Stock:     book.Stock,
+		CreatedAt: book.CreatedAt,
+		UpdatedAt: book.UpdatedAt,
+	}, nil
+}
+
+func (ucase *BookUcase) DeleteBook(
+	ctx context.Context,
+	currentUser dto.CurrentUser,
+	bookUUID string,
+) (*dto.DeleteBookRespData, error) {
+	// find book
+	book, err := ucase.bookRepo.GetByUUID(bookUUID)
+	if err != nil {
+		if err.Error() == "not found" {
+			logger.Errorf("err: %v", err)
+			return nil, &error_utils.CustomErr{
+				HttpCode: 404,
+				GrpcCode: codes.NotFound,
+				Message:  "not found",
+				Detail:   err,
+			}
+		} else {
+			logger.Errorf("err: %v", err)
+			return nil, &error_utils.CustomErr{
+				HttpCode: 500,
+				GrpcCode: codes.Internal,
+				Message:  "internal server error",
+				Detail:   err,
+			}
+		}
+	}
+
+	// validate user
+	if book.AuthorUUID.String() != currentUser.UUID {
+		logger.Errorf("err: %v", err)
+		return nil, &error_utils.CustomErr{
+			HttpCode: 403,
+			GrpcCode: codes.PermissionDenied,
+			Message:  "forbidden",
+			Detail:   "forbidden",
+		}
+	}
+
+	// delete book
+	err = ucase.bookRepo.Delete(bookUUID)
+	if err != nil {
+		logger.Errorf("err: %v", err)
+		return nil, &error_utils.CustomErr{
+			HttpCode: 500,
+			GrpcCode: codes.Internal,
+			Message:  "internal server error",
+			Detail:   err,
+		}
+	}
+
+	return &dto.DeleteBookRespData{
 		UUID:       book.UUID.String(),
 		AuthorUUID: book.AuthorUUID.String(),
 		CategoryUUID: func() *string {

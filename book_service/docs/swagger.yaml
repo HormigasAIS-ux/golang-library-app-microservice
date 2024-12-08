@@ -37,6 +37,23 @@ definitions:
       uuid:
         type: string
     type: object
+  dto.DeleteBookRespData:
+    properties:
+      author_uuid:
+        type: string
+      category_uuid:
+        type: string
+      created_at:
+        type: string
+      stock:
+        type: integer
+      title:
+        type: string
+      updated_at:
+        type: string
+      uuid:
+        type: string
+    type: object
   dto.PatchBookReq:
     properties:
       category_uuid:
@@ -92,6 +109,22 @@ paths:
       tags:
       - Books
   /books/{book_uuid}:
+    delete:
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/dto.BaseJSONResp'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.DeleteBookRespData'
+              type: object
+      security:
+      - BearerAuth: []
+      summary: Delete Book
+      tags:
+      - Books
     patch:
       parameters:
       - description: payload

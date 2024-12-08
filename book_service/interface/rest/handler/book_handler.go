@@ -20,6 +20,7 @@ type BookHandler struct {
 type IBookHandler interface {
 	Create(ctx *gin.Context)
 	PatchBook(ctx *gin.Context)
+	DeleteBook(ctx *gin.Context)
 }
 
 func NewBookHandler(
@@ -84,6 +85,42 @@ func (handler *BookHandler) PatchBook(ctx *gin.Context) {
 	}
 
 	data, err := handler.bookUcase.PatchBook(ctx, *currentUser, bookUUID, payload)
+	if err != nil {
+		handler.respWriter.HTTPCustomErr(ctx, err)
+		return
+	}
+
+	handler.respWriter.HTTPJsonOK(ctx, data)
+}
+
+// @Summary Delete Book
+// @Router /books/{book_uuid} [delete]
+// @Tags Books
+// @Success 200 {object} dto.BaseJSONResp{data=dto.DeleteBookRespData}
+// @Security BearerAuth
+func (handler *BookHandler) DeleteBook(
+	ctx *gin.Context,
+) {
+	bookUUID := ctx.Param("book_uuid")
+
+	var payload dto.PatchBookReq
+	if err := ctx.ShouldBindJSON(&payload); err != nil {
+		logger.Errorf("invalid payload: %v", err)
+		handler.respWriter.HTTPJson(ctx, 400, "invalid payload", err.Error(), nil)
+		return
+	}
+
+	currentUser, err := helper.GetCurrentUserFromGinCtx(ctx)
+	if err != nil {
+		handler.respWriter.HTTPCustomErr(ctx, err)
+		return
+	}
+
+	data, err := handler.bookUcase.DeleteBook(
+		ctx,
+		*currentUser,
+		bookUUID,
+	)
 	if err != nil {
 		handler.respWriter.HTTPCustomErr(ctx, err)
 		return

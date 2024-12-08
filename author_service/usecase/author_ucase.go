@@ -13,13 +13,14 @@ import (
 	"github.com/google/uuid"
 	"github.com/op/go-logging"
 	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 var logger = logging.MustGetLogger("main")
 
 type AuthorUcase struct {
-	authorRepo repository.IAuthorRepo
-	authRepo   repository.IAuthRepo
+	authorRepo            repository.IAuthorRepo
+	authGrpcServiceClient auth_pb.AuthServiceClient
 }
 
 type IAuthorUcase interface {
@@ -44,11 +45,11 @@ type IAuthorUcase interface {
 
 func NewAuthorUcase(
 	authorRepo repository.IAuthorRepo,
-	authRepo repository.IAuthRepo,
+	authGrpcServiceClient auth_pb.AuthServiceClient,
 ) IAuthorUcase {
 	return &AuthorUcase{
-		authorRepo: authorRepo,
-		authRepo:   authRepo,
+		authorRepo:            authorRepo,
+		authGrpcServiceClient: authGrpcServiceClient,
 	}
 }
 
@@ -65,12 +66,13 @@ func (u *AuthorUcase) CreateNewAuthor(
 
 	if payload.UserUUID != nil { // user uuid provided for auth service grpc call
 		logger.Debugf("payload.UserUUID: %s", *payload.UserUUID)
-		getUserResp, grpcCode, err := u.authRepo.RpcGetUserByUUID(
+		getUserResp, err := u.authGrpcServiceClient.GetUserByUUID(
 			ctx,
 			&auth_pb.GetUserByUUIDRequest{
 				Uuid: *payload.UserUUID,
 			},
 		)
+		grpcCode := status.Code(err)
 		logger.Debugf("getUserResp: %v, grpcCode: %v, err: %v", getUserResp, grpcCode, err)
 		if grpcCode != codes.OK {
 			switch grpcCode {
@@ -112,7 +114,7 @@ func (u *AuthorUcase) CreateNewAuthor(
 		userRole = getUserResp.Role
 
 	} else { // user uuid not provided for client call
-		createUserResp, grpcCode, err := u.authRepo.RpcCreateUser(
+		createUserResp, err := u.authGrpcServiceClient.CreateUser(
 			ctx,
 			&auth_pb.CreateUserReq{
 				Email:    payload.Email,
@@ -121,6 +123,7 @@ func (u *AuthorUcase) CreateNewAuthor(
 				Role:     payload.Role,
 			},
 		)
+		grpcCode := status.Code(err)
 
 		if grpcCode != codes.OK {
 			switch grpcCode {
@@ -281,7 +284,8 @@ func (u *AuthorUcase) EditAuthor(
 		updateUserReqPayload.RoleNull = true
 	}
 
-	updateUserResp, grpcCode, err := u.authRepo.RpcUpdateUser(ctx, &updateUserReqPayload)
+	updateUserResp, err := u.authGrpcServiceClient.UpdateUser(ctx, &updateUserReqPayload)
+	grpcCode := status.Code(err)
 	if grpcCode != codes.OK || err != nil {
 		return nil, &error_utils.CustomErr{
 			HttpCode: 500,
@@ -362,7 +366,8 @@ func (u *AuthorUcase) DeleteAuthor(ctx *gin.Context, authorUUID string) (*dto.De
 	}
 
 	// delete user through auth service
-	deleteUserResp, grpcCode, err := u.authRepo.RpcDeleteUser(ctx, &auth_pb.DeleteUserReq{Uuid: authorUUID})
+	deleteUserResp, err := u.authGrpcServiceClient.DeleteUser(ctx, &auth_pb.DeleteUserReq{Uuid: authorUUID})
+	grpcCode := status.Code(err)
 	if grpcCode != codes.OK || err != nil {
 		return nil, &error_utils.CustomErr{
 			HttpCode: 500,
@@ -454,12 +459,13 @@ func (u *AuthorUcase) GetAuthorDetail(ctx *gin.Context, authorUUID string) (*dto
 	}
 
 	// get user through auth service
-	getUserResp, grpcCode, err := u.authRepo.RpcGetUserByUUID(
+	getUserResp, err := u.authGrpcServiceClient.GetUserByUUID(
 		ctx,
 		&auth_pb.GetUserByUUIDRequest{
 			Uuid: author.UserUUID.String(),
 		},
 	)
+	grpcCode := status.Code(err)
 	if grpcCode != codes.OK {
 		return nil, &error_utils.CustomErr{
 			HttpCode: 500,

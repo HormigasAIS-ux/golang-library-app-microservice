@@ -45,11 +45,10 @@ func main() {
 
 	// repositories
 	// authRepo := repository.NewAuthRepo(authGrpcServiceClient)
-	authorRepo := repository.NewAuthorRepo(authorGrpcServiceClient)
 	bookRepo := repository.NewBookRepo(gormDB)
 
 	// ucases
-	bookUcase := ucase.NewBookUcase(bookRepo, authorRepo)
+	bookUcase := ucase.NewBookUcase(bookRepo, authorGrpcServiceClient)
 	dependencies := interface_pkg.CommonDependency{
 		BookUcase: bookUcase,
 	}
@@ -64,9 +63,8 @@ func main() {
 
 		// validate args
 		variables := validArgVariables
-		for _, preRunVariable := range validPreRunArgVariables {
-			variables = append(variables, preRunVariable)
-		}
+		variables = append(variables, validPreRunArgVariables...)
+
 		// logger.Debugf("variables: %v", variables)
 		for _, arg := range args[1:] {
 			valid := false
@@ -105,9 +103,7 @@ func main() {
 
 		// process args
 		variables = preArgs
-		for _, postArg := range postArgs {
-			variables = append(variables, postArg)
-		}
+		variables = append(variables, postArgs...)
 		for _, arg := range variables {
 			if strings.Contains(arg, fmt.Sprintf("--%s=", "server")) {
 				value := strings.Split(arg, "=")[1]

@@ -168,9 +168,7 @@
                     "type": "integer"
                 },
                 "data": {},
-                "detail": {
-                    "type": "string"
-                },
+                "detail": {},
                 "message": {
                     "type": "string"
                 }
@@ -193,7 +191,7 @@
                 "email": {
                     "type": "string"
                 },
-                "fullname": {
+                "role": {
                     "type": "string"
                 },
                 "username": {
@@ -256,15 +254,11 @@
             "type": "object",
             "required": [
                 "email",
-                "fullname",
                 "password",
                 "username"
             ],
             "properties": {
                 "email": {
-                    "type": "string"
-                },
-                "fullname": {
                     "type": "string"
                 },
                 "password": {
