@@ -10,57 +10,57 @@ import (
 	"gorm.io/gorm"
 )
 
-type BookRepo struct {
+type BookBorrowRepo struct {
 	db *gorm.DB
 }
 
-type IBookRepo interface {
-	Create(book *model.Book) error
-	GetByUUID(uuid string) (*model.Book, error)
-	Update(book *model.Book) error
+type IBookBorrowRepo interface {
+	Create(book *model.BookBorrow) error
+	GetByUUID(uuid string) (*model.BookBorrow, error)
+	Update(book *model.BookBorrow) error
 	Delete(id string) error
 	GetList(
 		ctx context.Context,
-		params dto.BookRepo_GetListParams,
-	) ([]model.Book, error)
+		params dto.BookBorrowRepo_GetListParams,
+	) ([]model.BookBorrow, error)
 	CountGetList(
 		ctx context.Context,
-		params dto.BookRepo_GetListParams,
+		params dto.BookBorrowRepo_GetListParams,
 	) (int64, error)
 }
 
-func NewBookRepo(db *gorm.DB) IBookRepo {
-	return &BookRepo{
+func NewBookBorrowRepo(db *gorm.DB) IBookBorrowRepo {
+	return &BookBorrowRepo{
 		db: db,
 	}
 }
 
-func (repo *BookRepo) Create(book *model.Book) error {
-	err := repo.db.Create(book).Error
+func (repo *BookBorrowRepo) Create(bookBorrow *model.BookBorrow) error {
+	err := repo.db.Create(bookBorrow).Error
 	if err != nil {
 		return errors.New("failed to create: " + err.Error())
 	}
 	return err
 }
 
-func (repo *BookRepo) GetByUUID(uuid string) (*model.Book, error) {
-	var book model.Book
-	if err := repo.db.First(&book, "uuid = ?", uuid).Error; err != nil {
+func (repo *BookBorrowRepo) GetByUUID(uuid string) (*model.BookBorrow, error) {
+	var bookBorrow model.BookBorrow
+	if err := repo.db.First(&bookBorrow, "uuid = ?", uuid).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return nil, errors.New("not found")
 		}
 		return nil, errors.New("failed to get: " + err.Error())
 	}
-	return &book, nil
+	return &bookBorrow, nil
 }
 
-func (repo *BookRepo) Update(book *model.Book) error {
-	err := repo.db.Save(book).Error
+func (repo *BookBorrowRepo) Update(bookBorrow *model.BookBorrow) error {
+	err := repo.db.Save(bookBorrow).Error
 	return err
 }
 
-func (repo *BookRepo) Delete(id string) error {
-	err := repo.db.Delete(&model.Book{}, "id = ?", id).Error
+func (repo *BookBorrowRepo) Delete(id string) error {
+	err := repo.db.Delete(&model.BookBorrow{}, "id = ?", id).Error
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return errors.New("not found")
@@ -70,16 +70,16 @@ func (repo *BookRepo) Delete(id string) error {
 	return err
 }
 
-func (repo *BookRepo) GetList(
+func (repo *BookBorrowRepo) GetList(
 	ctx context.Context,
-	params dto.BookRepo_GetListParams,
-) ([]model.Book, error) {
+	params dto.BookBorrowRepo_GetListParams,
+) ([]model.BookBorrow, error) {
 	// validate param
 	if params.SortOrder != "asc" && params.SortOrder != "desc" {
 		return nil, fmt.Errorf("invalid sort order")
 	}
 
-	var models []model.Book
+	var models []model.BookBorrow
 
 	tx := repo.db.Model(&models)
 
@@ -117,11 +117,11 @@ func (repo *BookRepo) GetList(
 	return models, nil
 }
 
-func (repo *BookRepo) CountGetList(
+func (repo *BookBorrowRepo) CountGetList(
 	ctx context.Context,
-	params dto.BookRepo_GetListParams,
+	params dto.BookBorrowRepo_GetListParams,
 ) (int64, error) {
-	tx := repo.db.Model(&model.Book{})
+	tx := repo.db.Model(&model.BookBorrow{})
 
 	if params.AuthorUUID != "" {
 		tx = tx.Where("author_uuid = ?", params.AuthorUUID)
