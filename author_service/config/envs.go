@@ -18,6 +18,7 @@ type EnvsSchema struct {
 	POSTGRESQL_DB       string
 
 	AUTH_GRPC_SERVICE string
+	BOOK_GRPC_SERVICE string
 }
 
 var Envs *EnvsSchema
@@ -35,6 +36,7 @@ func envInitiator() {
 		POSTGRESQL_PASSWORD: viper.GetString("POSTGRESQL_PASSWORD"),
 		POSTGRESQL_DB:       viper.GetString("POSTGRESQL_DB"),
 		AUTH_GRPC_SERVICE:   viper.GetString("AUTH_GRPC_SERVICE"),
+		BOOK_GRPC_SERVICE:   viper.GetString("BOOK_GRPC_SERVICE"),
 	}
 }
 
