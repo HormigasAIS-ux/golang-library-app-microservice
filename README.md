@@ -84,8 +84,6 @@ This project consists of four services: `auth_service`, `book_service`, `categor
 
 - book_service:
  `{host}:7003`
-  Not implemented yet
 
 - category_service:
  `{host}:7004`
-  Not implemented yet
