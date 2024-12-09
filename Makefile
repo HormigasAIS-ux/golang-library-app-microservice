@@ -1,7 +1,7 @@
 PROTO_PATH = common/proto
-PROTO_FILES = auth.proto author.proto book.proto
-SERVICES = auth_service author_service book_service
-SERVICE_PATHS = ./auth_service ./author_service ./book_service
+PROTO_FILES = auth.proto author.proto book.proto category.proto
+SERVICES = auth_service author_service book_service category_service
+SERVICE_PATHS = ./auth_service ./author_service ./book_service ./category_service
 
 genproto:
 	@for service in $(SERVICES); do \

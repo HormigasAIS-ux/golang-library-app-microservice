@@ -1,0 +1,247 @@
+definitions:
+  dto.BaseJSONResp:
+    properties:
+      code:
+        type: integer
+      data: {}
+      detail: {}
+      message:
+        type: string
+    type: object
+  dto.CreateCategoryReq:
+    properties:
+      name:
+        type: string
+    required:
+    - name
+    type: object
+  dto.CreateCategoryRespData:
+    properties:
+      created_at:
+        type: string
+      created_by:
+        type: string
+      name:
+        type: string
+      updated_at:
+        type: string
+      uuid:
+        type: string
+    type: object
+  dto.DeleteCategoryRespData:
+    properties:
+      created_at:
+        type: string
+      created_by:
+        type: string
+      name:
+        type: string
+      updated_at:
+        type: string
+      uuid:
+        type: string
+    type: object
+  dto.GetCategoryDetailRespData:
+    properties:
+      book_total:
+        type: integer
+      created_at:
+        type: string
+      created_by:
+        type: string
+      name:
+        type: string
+      updated_at:
+        type: string
+      uuid:
+        type: string
+    type: object
+  dto.GetListCategoryRespData:
+    properties:
+      current_page:
+        type: integer
+      data:
+        items:
+          $ref: '#/definitions/dto.GetListCategoryRespDataItem'
+        type: array
+      total_data:
+        type: integer
+      total_page:
+        type: integer
+    type: object
+  dto.GetListCategoryRespDataItem:
+    properties:
+      book_total:
+        type: integer
+      created_at:
+        type: string
+      created_by:
+        type: string
+      name:
+        type: string
+      updated_at:
+        type: string
+      uuid:
+        type: string
+    type: object
+  dto.PatchCategoryReq:
+    properties:
+      name:
+        type: string
+    type: object
+  dto.PatchCategoryRespData:
+    properties:
+      created_at:
+        type: string
+      created_by:
+        type: string
+      name:
+        type: string
+      updated_at:
+        type: string
+      uuid:
+        type: string
+    type: object
+info:
+  contact: {}
+  title: Category Service RESTful API
+paths:
+  /categories:
+    get:
+      parameters:
+      - default: 10
+        in: query
+        name: limit
+        type: integer
+      - default: 1
+        in: query
+        name: page
+        type: integer
+      - in: query
+        name: query
+        type: string
+      - default: any
+        enum:
+        - name
+        - any
+        in: query
+        name: query_by
+        type: string
+      - default: created_at
+        enum:
+        - created_at
+        - updated_at
+        - name
+        in: query
+        name: sort_by
+        type: string
+      - default: desc
+        enum:
+        - asc
+        - desc
+        in: query
+        name: sort_order
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/dto.BaseJSONResp'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.GetListCategoryRespData'
+              type: object
+      security:
+      - BearerAuth: []
+      summary: Get category list
+      tags:
+      - Categories
+  /category:
+    post:
+      parameters:
+      - description: payload
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CreateCategoryReq'
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/dto.BaseJSONResp'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.CreateCategoryRespData'
+              type: object
+      security:
+      - BearerAuth: []
+      summary: Create new category
+      tags:
+      - Categories
+  /category/{category_uuid}:
+    delete:
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/dto.BaseJSONResp'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.DeleteCategoryRespData'
+              type: object
+      security:
+      - BearerAuth: []
+      summary: Delete category
+      tags:
+      - Categories
+    get:
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/dto.BaseJSONResp'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.GetCategoryDetailRespData'
+              type: object
+      security:
+      - BearerAuth: []
+      summary: Get category detail
+      tags:
+      - Categories
+    patch:
+      parameters:
+      - description: payload
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/dto.PatchCategoryReq'
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/dto.BaseJSONResp'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.PatchCategoryRespData'
+              type: object
+      security:
+      - BearerAuth: []
+      summary: patch category
+      tags:
+      - Categories
+securityDefinitions:
+  BearerAuth:
+    description: JWT Authorization header using the Bearer scheme (add 'Bearer ' prefix).
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

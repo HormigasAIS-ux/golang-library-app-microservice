@@ -66,23 +66,26 @@ This project consists of four services: `auth_service`, `book_service`, `categor
 - auth_service:
   `http://{host}:8001/swagger/index.html`
 
+- author_service:
+  `http://{host}:8002/swagger/index.html`
+
 - book_service:
   `http://{host}:8003/swagger/index.html`
 
-- category_service: Not implemented yet
-
-- author_service:
-  `http://{host}:8002/swagger/index.html`
+- category_service:
+  `http://{host}:8004/swagger/index.html`
 
 ## gRPC Ports
 - auth_service:
  `{host}:7001`
 
-- auth_service:
+- author_service:
  `{host}:7002`
 
-- category_service:
+- book_service:
+ `{host}:7003`
   Not implemented yet
 
-- author_service:
+- category_service:
+ `{host}:7004`
   Not implemented yet

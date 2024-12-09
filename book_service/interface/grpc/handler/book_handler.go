@@ -19,7 +19,7 @@ type BookServiceHandler struct {
 
 var logger = logging.MustGetLogger("main")
 
-func NewAuthorServiceHandler(bookUcase ucase.IBookUcase) *BookServiceHandler {
+func NewBookServiceHandler(bookUcase ucase.IBookUcase) *BookServiceHandler {
 	handler := &BookServiceHandler{bookUcase: bookUcase}
 	return handler
 }

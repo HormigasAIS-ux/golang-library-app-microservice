@@ -103,13 +103,6 @@ func (handler *BookHandler) DeleteBook(
 ) {
 	bookUUID := ctx.Param("book_uuid")
 
-	var payload dto.PatchBookReq
-	if err := ctx.ShouldBindJSON(&payload); err != nil {
-		logger.Errorf("invalid payload: %v", err)
-		handler.respWriter.HTTPJson(ctx, 400, "invalid payload", err.Error(), nil)
-		return
-	}
-
 	currentUser, err := helper.GetCurrentUserFromGinCtx(ctx)
 	if err != nil {
 		handler.respWriter.HTTPCustomErr(ctx, err)

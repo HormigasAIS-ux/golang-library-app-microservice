@@ -111,7 +111,7 @@ services:
         condition: service_healthy
     restart: always
 
-    # BOOK SERVICE
+  # BOOK SERVICE
   syn_book_service_rest:
     image: ${BOOK_SERVICE_IMAGE}
     build:
@@ -147,6 +147,40 @@ services:
         condition: service_healthy
     restart: always
 
+  # CATEGORY SERVICE
+  syn_category_service_rest:
+    image: ${CATEGORY_SERVICE_IMAGE}
+    build:
+      context: ./category_service
+    container_name: syn_category_service_rest
+    command: ["./category_service", "--server=rest"]
+    ports:
+      - "8004:8004"
+    networks:
+      - my_network
+    env_file:
+      - ./category_service/.env
+    depends_on:
+      backend_syn_db:
+        condition: service_healthy
+    restart: always
+
+  syn_category_service_grpc:
+    image: ${CATEGORY_SERVICE_IMAGE}
+    build:
+      context: ./category_service
+    container_name: syn_category_service_grpc
+    command: ["./category_service", "--server=grpc"]
+    ports:
+      - "7004:7004"
+    networks:
+      - my_network
+    env_file:
+      - ./category_service/.env
+    depends_on:
+      backend_syn_db:
+        condition: service_healthy
+    restart: always
 
 volumes:
   postgres_data:
