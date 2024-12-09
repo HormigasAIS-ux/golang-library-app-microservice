@@ -56,6 +56,9 @@ func SetupServer(commonDependencies interface_pkg.CommonDependency) {
 
 	// swagger
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
+	router.GET("/", func(ctx *gin.Context) {
+		ctx.Redirect(302, "/swagger/index.html")
+	})
 
 	router.Run(fmt.Sprintf("%s:%d", config.Envs.HOST, config.Envs.PORT))
 }
