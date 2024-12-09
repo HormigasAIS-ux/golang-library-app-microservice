@@ -46,8 +46,8 @@ func SetupServer(commonDependencies interface_pkg.CommonDependency) {
 	secureRouter.Use(authMiddleware)
 	// secured
 	{
-		// /books
-		bookRouter := secureRouter.Group("/books")
+		// /categories
+		bookRouter := secureRouter.Group("/categories")
 		{
 			bookRouter.PATCH("/:category_uuid", categoryHandler.PatchCategory)   // owner only
 			bookRouter.DELETE("/:category_uuid", categoryHandler.DeleteCategory) // owner only
