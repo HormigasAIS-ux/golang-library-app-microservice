@@ -170,8 +170,36 @@ func (ucase *BookUcase) PatchBook(
 		}
 	}
 
+	// get author by user uuid through author service
+	getAuthorResp, err := ucase.authorGrpcServiceClient.GetAuthorByUserUUID(
+		ctx, &author_grpc.GetAuthorByUserUUIDReq{
+			UserUuid: currentUser.UUID,
+		},
+	)
+
+	grpcCode := status.Code(err)
+
+	if grpcCode != codes.OK {
+		logger.Debugf("grpcCode: %v;\nerr: %v", grpcCode, err)
+		return nil, &error_utils.CustomErr{
+			HttpCode: 500,
+			GrpcCode: codes.Internal,
+			Message:  "internal server error",
+			Detail:   err,
+		}
+	}
+
+	if getAuthorResp == nil || getAuthorResp.Uuid == "" {
+		return nil, &error_utils.CustomErr{
+			HttpCode: 500,
+			GrpcCode: codes.Internal,
+			Message:  "internal server error",
+			Detail:   "getAuthorResp is nil or getAuthorResp.Uuid is empty",
+		}
+	}
+
 	// validate user
-	if book.AuthorUUID.String() != currentUser.UUID {
+	if book.AuthorUUID.String() != getAuthorResp.Uuid {
 		logger.Errorf("err: %v", err)
 		return nil, &error_utils.CustomErr{
 			HttpCode: 403,
@@ -257,8 +285,36 @@ func (ucase *BookUcase) DeleteBook(
 		}
 	}
 
+	// get author by user uuid through author service
+	getAuthorResp, err := ucase.authorGrpcServiceClient.GetAuthorByUserUUID(
+		ctx, &author_grpc.GetAuthorByUserUUIDReq{
+			UserUuid: currentUser.UUID,
+		},
+	)
+
+	grpcCode := status.Code(err)
+
+	if grpcCode != codes.OK {
+		logger.Debugf("grpcCode: %v;\nerr: %v", grpcCode, err)
+		return nil, &error_utils.CustomErr{
+			HttpCode: 500,
+			GrpcCode: codes.Internal,
+			Message:  "internal server error",
+			Detail:   err,
+		}
+	}
+
+	if getAuthorResp == nil || getAuthorResp.Uuid == "" {
+		return nil, &error_utils.CustomErr{
+			HttpCode: 500,
+			GrpcCode: codes.Internal,
+			Message:  "internal server error",
+			Detail:   "getAuthorResp is nil or getAuthorResp.Uuid is empty",
+		}
+	}
+
 	// validate user
-	if book.AuthorUUID.String() != currentUser.UUID {
+	if book.AuthorUUID.String() != getAuthorResp.Uuid {
 		logger.Errorf("err: %v", err)
 		return nil, &error_utils.CustomErr{
 			HttpCode: 403,
