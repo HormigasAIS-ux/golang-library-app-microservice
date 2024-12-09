@@ -21,6 +21,8 @@ func AuthMiddleware(respWriter http_response.IHttpResponseWriter) gin.HandlerFun
 			return
 		}
 
+		token = strings.TrimPrefix(token, "Bearer ")
+
 		currentUser, err := jwt_util.ValidateJWT(token, config.Envs.JWT_SECRET_KEY)
 		if err != nil {
 			respWriter.HTTPJson(

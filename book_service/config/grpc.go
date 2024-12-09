@@ -17,7 +17,7 @@ import (
 // }
 
 func NewAuthorGrpcServiceClient() author_pb.AuthorServiceClient {
-	conn, err := grpc.NewClient(Envs.AUTHOR_GRPC_SERVCICE, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	conn, err := grpc.NewClient(Envs.AUTHOR_GRPC_SERVICE, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		logger.Fatalf("Failed to connect to auth grpc service: %v", err)
 	}
