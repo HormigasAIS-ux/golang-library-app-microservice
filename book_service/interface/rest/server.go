@@ -51,6 +51,7 @@ func SetupServer(commonDependencies interface_pkg.CommonDependency) {
 		{
 			bookRouter.POST("", bookHandler.Create)
 			bookRouter.PATCH("/:book_uuid", bookHandler.PatchBook)
+			bookRouter.DELETE("/:book_uuid", bookHandler.DeleteBook)
 		}
 	}
 
