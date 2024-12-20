@@ -1,4 +1,4 @@
-# BACKEND (STILL DEVELOPMENT)
+# Library APP Backend Microservice
 
 ### Key Features
 1. **Role-Based Access Control (RBAC)**
