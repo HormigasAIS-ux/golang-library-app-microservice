@@ -11,7 +11,7 @@ type CustomErr struct {
 }
 
 func (slf *CustomErr) Error() string {
-	if slf.Detail != "" || slf.Detail != nil {
+	if slf.Detail != "" && slf.Detail != nil {
 		err, ok := slf.Detail.(error)
 		if ok {
 			return err.Error()
