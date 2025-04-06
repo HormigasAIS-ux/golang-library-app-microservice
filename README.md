@@ -30,13 +30,13 @@ This project consists of four services: `auth_service`, `book_service`, `categor
    - In the root project directory, create a `.env` file by copying the contents of [`.env.example`](./.env.example) and fill it up:
 
      ```bash
-     cp .env.example .env
+     cp .env.git-rebase-hormiga.env
      ```
 
    - In each service directory (`auth_service`, `book_service`, `category_service`, `author_service`), create a `.env` file by copying the contents of the corresponding `.env.example` file and fill it up:
 
      ```bash
-     cp <service_name>/.env.example <service_name>/.env
+     cp <service_git-rebase-hormiga>/.env.example <service_git-rebase-hormiga>/.env
      ```
 
      Replace `service_name` with the name of each service (e.g., `auth_service`, `book_service`, etc.).
@@ -53,7 +53,7 @@ This project consists of four services: `auth_service`, `book_service`, `categor
 
 3. **Use Local Image (Optional)**
 
-   - If you want to use a local image instead of pulling from a registry, you can leave empty the `*_SERVICE_IMAGE` in the `.env` file (refer to [`./env.example`](./env.example)) and run docker compose with `--build` flag:
+   - If you want to use a local image instead of pulling from a registry, you can leave empty the `*_SERVICE_IMAGE` in the `.env` file (refer to [`.bash/env.bashrc`](./env.example)) and run docker compose with `--build` flag:
 
      ```bash
      docker-compose up -d --build
