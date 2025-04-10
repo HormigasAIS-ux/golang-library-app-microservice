@@ -1,0 +1,8 @@
+"scripts": {
+  "prepare": "husky install"
+},
+"husky": {
+  "hooks": {
+    "pre-commit": "node ./check-user.js"
+  }
+}
